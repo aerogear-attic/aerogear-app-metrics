@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/aerogear/aerogear-metrics-api/pkg/models"
-	boom "github.com/darahayes/go-boom"
+	"github.com/darahayes/go-boom"
 )
 
 func createMetric(w http.ResponseWriter, r *http.Request) {
