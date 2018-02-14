@@ -3,7 +3,7 @@ package dao
 import (
 	"errors"
 
-	"github.com/darahayes/aerogear-metrics-api/pkg/models"
+	"github.com/aerogear/aerogear-metrics-api/pkg/models"
 )
 
 type MetricsDAO struct {
