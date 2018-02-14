@@ -1,0 +1,10 @@
+postgres:
+  image: timescale/timescaledb
+  ports:
+    - 5432:5432
+  environment:
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_USER: postgres
+    PGDATA : /var/lib/postgresql/data/pgdata
+  volumes:
+    - psqlvolumes:/var/lib/postgresql/data/pgdata
