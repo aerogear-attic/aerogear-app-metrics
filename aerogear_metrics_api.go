@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/aerogear/aerogear-metrics-api/pkg/handlers"
@@ -21,5 +22,5 @@ func main() {
 	})
 
 	port := ":3001"
-	http.ListenAndServe(port, router)
+	log.Fatal(http.ListenAndServe(port, router))
 }
