@@ -21,6 +21,7 @@ jobs:
     steps:
       - checkout
       - run: go get github.com/mattn/goveralls
-      - run: go get
+      - run: go get -u github.com/golang/dep/cmd/dep
+      - run: dep ensure
       - run: go test -v -cover -race -coverprofile=coverage.out
       - run: /go/bin/goveralls -coverprofile=coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
