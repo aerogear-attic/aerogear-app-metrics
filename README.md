@@ -8,11 +8,19 @@ This is the server component of the AeroGear metrics service. It is a RESTful AP
 * [Install the dep package manager](https://golang.github.io/dep/docs/installation.html)
 * [Install Docker and Docker Compose](https://docs.docker.com/compose/install/)
 
-## How to Run
+## Clone and Install Dependencies
 
 First clone this repository to `$GOPATH/src/github.com/aerogear/aerogear-metrics-api`
 
-Then use `docker-compose` to start the PostgreSQL container:
+Then run the following command to install the dependencies
+
+```
+dep ensure
+```
+
+## How to Run
+
+Use `docker-compose` to start the PostgreSQL container:
 
 ```
 docker-compose up
