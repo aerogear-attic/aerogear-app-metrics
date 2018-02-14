@@ -1,8 +1,0 @@
-version: '3'
-services:
-  mongo:
-    image: tutum/mongodb
-    environment:
-      AUTH: "no"
-    ports:
-        - 27017:27017
