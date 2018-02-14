@@ -6,4 +6,4 @@ ADD . /aerogear-metrics-api
 
 WORKDIR /aerogear-metrics-api
 
-CMD ["./aerogear-metrics-api"]
+CMD ["./aerogear_metrics_api"]
