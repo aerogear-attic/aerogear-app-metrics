@@ -1,5 +1,7 @@
 # AeroGear Metrics API
 
+**Please note this repo is a suggested implementation.** We have not agreed on implementing the service with Golang.
+
 This is the server component of the AeroGear metrics service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database. The service is written in Golang.
 
 ## Prerequisites
