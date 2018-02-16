@@ -31,7 +31,7 @@ docker-compose up
 Now you can build and run the application locally with the following command:
 
 ```
-go run cmd/aerogear-metrics-api.go
+go run cmd/metrics-api/metrics-api.go
 ```
 
 The default configuration will allow the application to connect to the PostgreSQL container.
@@ -41,10 +41,10 @@ The default configuration will allow the application to connect to the PostgreSQ
 To build an executable of the application simply run:
 
 ```
-go build cmd/aerogear-metrics-api
+go build cmd/metrics-api/metrics-api.go
 ```
 
-This will produce a binary called `aerogear-metrics-api`
+This will produce a binary called `metrics-api` in your current directory
 
 ### Docker Build
 
