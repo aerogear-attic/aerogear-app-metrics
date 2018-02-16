@@ -1,16 +1,15 @@
 package dao
 
 import (
-	"errors"
 	"database/sql"
+	"errors"
+
 	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 )
 
 type MetricsDAO struct {
 	db *sql.DB
 }
-
-
 
 // Create a metrics record
 func (m *MetricsDAO) Create(metric mobile.Metric) (mobile.Metric, error) {
@@ -37,6 +36,6 @@ func (m *MetricsDAO) CheckConnection() {
 
 func NewMetricsDAO(db *sql.DB) *MetricsDAO {
 	return &MetricsDAO{
-		db:db,
+		db: db,
 	}
 }

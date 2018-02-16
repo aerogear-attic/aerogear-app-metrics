@@ -4,20 +4,19 @@ import (
 	"encoding/json"
 	"net/http"
 
-
-	"github.com/darahayes/go-boom"
 	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
+	"github.com/darahayes/go-boom"
 )
 
-type metricsHandler struct{
+type metricsHandler struct {
 	metricService *mobile.MetricsService
 }
 
-func NewMetricsHandler(ms *mobile.MetricsService)*metricsHandler  {
-	return &metricsHandler{metricService:ms}
+func NewMetricsHandler(ms *mobile.MetricsService) *metricsHandler {
+	return &metricsHandler{metricService: ms}
 }
 
-func(mh * metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
+func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	var metric mobile.Metric
@@ -37,8 +36,8 @@ func(mh * metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := withJSON(w, 200, result); err != nil{
-		http.Error(w,err.Error(),http.StatusInternalServerError)
+	if err := withJSON(w, 200, result); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
