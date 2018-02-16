@@ -23,5 +23,5 @@ jobs:
       - run: go get github.com/mattn/goveralls
       - run: go get -u github.com/golang/dep/cmd/dep
       - run: dep ensure
-      - run: go test -v -coverpkg=./...  ./...
-      - run: /go/bin/goveralls -coverpkg=./... -service=circle-ci -repotoken=$COVERALLS_TOKEN
+      - run: go test -v -coverpkg=./... ./...
+      - run: /go/bin/goveralls -service=circle-ci -repotoken=$COVERALLS_TOKEN
