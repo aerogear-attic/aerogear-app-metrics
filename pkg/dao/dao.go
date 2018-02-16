@@ -2,21 +2,18 @@ package dao
 
 import (
 	"errors"
-
-	"github.com/aerogear/aerogear-metrics-api/pkg/models"
+	"database/sql"
+	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 )
 
 type MetricsDAO struct {
-	DBConnectionString string
+	db *sql.DB
 }
 
-// Connect to database
-func (m *MetricsDAO) Connect() {
 
-}
 
 // Create a metrics record
-func (m *MetricsDAO) Create(metric models.Metric) (models.Metric, error) {
+func (m *MetricsDAO) Create(metric mobile.Metric) (mobile.Metric, error) {
 	return metric, errors.New("Not Implemented yet")
 }
 
@@ -38,8 +35,8 @@ func (m *MetricsDAO) CheckConnection() {
 
 }
 
-func GetMetricsDAO(connectionString string) MetricsDAO {
-	return MetricsDAO{
-		DBConnectionString: connectionString,
+func NewMetricsDAO(db *sql.DB) *MetricsDAO {
+	return &MetricsDAO{
+		db:db,
 	}
 }
