@@ -16,9 +16,9 @@ This is the server component of the AeroGear metrics service. It is a RESTful AP
 ```
 go get github.com/aerogear/aerogear-metrics-api
 ```
-1. Run the following command to install the dependencies
+1. Run the following command to build binary
 ```
-dep ensure
+make build
 ```
 
 ## How to Run
@@ -36,16 +36,6 @@ go run cmd/metrics-api/metrics-api.go
 ```
 
 The default configuration will allow the application to connect to the PostgreSQL container.
-
-### How to Build
-
-To build an executable of the application simply run:
-
-```
-go build cmd/metrics-api/metrics-api.go
-```
-
-This will produce a binary called `metrics-api` in your current directory
 
 ### Docker Build
 
