@@ -13,7 +13,7 @@ setup:
 	dep ensure
 
 .PHONY: build
-build: setup check build_binary
+build: setup build_binary
 
 .PHONY: build_binary_linux
 build_binary_linux:
@@ -44,13 +44,12 @@ fmt:
 	@echo go fmt
 	diff -u <(echo -n) <(gofmt -d `find . -type f -name '*.go' -not -path "./vendor/*"`)
 
-.PHONY: check
-check: errcheck vet fmt test-unit
-
 .PHONY: clean
 clean:
-	-rm -f ${BINARY}-*
+	-rm -f ${BINARY}
 
 .PHONY: release
 release: setup
-	goreleaser --rm-dist
+	goreleaser --rm-dist --snapshot
+
+.PHONY: build
