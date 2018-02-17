@@ -12,10 +12,11 @@ This is the server component of the AeroGear metrics service. It is a RESTful AP
 
 ## Clone and Install Dependencies
 
-First clone this repository to `$GOPATH/src/github.com/aerogear/aerogear-metrics-api`
-
-Then run the following command to install the dependencies
-
+1. Clone this repository
+```
+go get github.com/aerogear/aerogear-metrics-api
+```
+1. Run the following command to install the dependencies
 ```
 dep ensure
 ```
