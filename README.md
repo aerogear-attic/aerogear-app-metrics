@@ -26,6 +26,7 @@ make build
 Use `docker-compose` to start the PostgreSQL container:
 
 ```
+cd deployments/docker
 docker-compose up
 ```
 
