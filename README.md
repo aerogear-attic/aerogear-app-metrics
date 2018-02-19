@@ -46,3 +46,16 @@ Simply run the following:
 cd deployments/docker
 docker build -t aerogear/aerogear-metrics-api .
 ```
+
+### Release
+
+Builds and publish to github releases using `goreleaser`.
+See `.goreleaser.yml` for configuration
+
+Preparing release:
+```
+brew install goreleaser
+## Replace x with version
+git tag -a v0.0.X -m "Release 0.0.x"
+make release
+```
