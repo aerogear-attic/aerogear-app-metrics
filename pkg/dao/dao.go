@@ -16,18 +16,6 @@ func (m *MetricsDAO) Create(metric mobile.Metric) (mobile.Metric, error) {
 	return metric, errors.New("Not Implemented yet")
 }
 
-// Update an existing job
-// Not sure if we need this
-func (m *MetricsDAO) Update() {
-
-}
-
-// Delete an existing job
-// Not sure if we need this
-func (m *MetricsDAO) Delete() {
-
-}
-
 // Ping checks that we are connected to the database
 // This will be used by the healthcheck
 func (m *MetricsDAO) Ping() error {

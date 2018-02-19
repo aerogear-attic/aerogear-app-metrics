@@ -1,9 +1,5 @@
 package mobile
 
-import (
-	"errors"
-)
-
 type MetricsService struct {
 	mdao MetricCreator
 }
@@ -13,5 +9,5 @@ func NewMetricsService(dao MetricCreator) *MetricsService {
 }
 
 func (m MetricsService) Create(metric Metric) (Metric, error) {
-	return metric, errors.New("This is an error")
+	return metric, nil
 }
