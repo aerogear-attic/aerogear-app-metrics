@@ -1,17 +1,16 @@
 FROM golang:latest
 
+# Output location for make build
+ENV BINARY=/metrics-api/metrics-api
+
 RUN mkdir -p /go/src/github.com/aerogear/aerogear-metrics-api/
 RUN mkdir /metrics-api
 
-ADD . /go/src/github.com/aerogear/aerogear-metrics-api/
+COPY . /go/src/github.com/aerogear/aerogear-metrics-api/
 
 WORKDIR /go/src/github.com/aerogear/aerogear-metrics-api/
 
 RUN go get github.com/golang/dep/cmd/dep
-RUN dep ensure
-
-RUN go build -o /metrics-api/metrics-api ./cmd/metrics-api/metrics-api.go
-
-RUN ls /metrics-api
+RUN make build
 
 CMD ["/metrics-api/metrics-api"]
