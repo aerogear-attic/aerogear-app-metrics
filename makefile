@@ -50,6 +50,6 @@ clean:
 
 .PHONY: release
 release: setup
-	goreleaser --rm-dist --snapshot
+	goreleaser --rm-dist
 
 .PHONY: build
