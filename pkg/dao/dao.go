@@ -28,10 +28,10 @@ func (m *MetricsDAO) Delete() {
 
 }
 
-// CheckConnection checks that we are connected to the database
+// Ping checks that we are connected to the database
 // This will be used by the healthcheck
-func (m *MetricsDAO) CheckConnection() {
-
+func (m *MetricsDAO) Ping() error {
+	return m.db.Ping()
 }
 
 func NewMetricsDAO(db *sql.DB) *MetricsDAO {
