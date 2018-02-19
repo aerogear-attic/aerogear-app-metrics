@@ -4,7 +4,7 @@ PACKAGES     ?= $(shell sh -c "find $(TOP_SRC_DIRS) -name \\*_test.go \
                    -exec dirname {} \\; | sort | uniq")
 BIN_DIR := $(GOPATH)/bin
 SHELL = /bin/bash
-BINARY = metrics
+BINARY ?= metrics
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
