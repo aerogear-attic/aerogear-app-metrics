@@ -12,13 +12,16 @@ This is the server component of the AeroGear metrics service. It is a RESTful AP
 
 ## Clone and Install Dependencies
 
-1. Clone this repository
+1. Clone this repository to `$GOPATH/src/github.com/aerogear/aerogear-metrics-api`
+```sh
+mkdir -p $GOPATH/src/github.com/aerogear
+cd $GOPATH/src/github.com/aerogear
+git clone git@github.com:aerogear/aerogear-metrics-api.git
 ```
-go get github.com/aerogear/aerogear-metrics-api
+
+2. Run the following command install dependencies
 ```
-1. Run the following command to build binary
-```
-make build
+dep ensure
 ```
 
 ## How to Run
@@ -38,7 +41,7 @@ go run cmd/metrics-api/metrics-api.go
 
 The default configuration will allow the application to connect to the PostgreSQL container.
 
-### Docker Build
+## Docker Build
 
 Simply run the following:
 
@@ -47,7 +50,13 @@ cd deployments/docker
 docker build -t aerogear/aerogear-metrics-api .
 ```
 
-### Release
+## Build binary
+Run:
+```
+make build
+```
+
+## Release
 
 Builds and publish to github releases using `goreleaser`.
 See `.goreleaser.yml` for configuration
