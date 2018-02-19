@@ -43,5 +43,6 @@ The default configuration will allow the application to connect to the PostgreSQ
 Simply run the following:
 
 ```
+cd deployments/docker
 docker build -t aerogear/aerogear-metrics-api .
 ```
