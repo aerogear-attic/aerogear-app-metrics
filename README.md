@@ -10,33 +10,50 @@ This is the server component of the AeroGear metrics service. It is a RESTful AP
 * [Install the dep package manager](https://golang.github.io/dep/docs/installation.html)
 * [Install Docker and Docker Compose](https://docs.docker.com/compose/install/)
 
-## Clone and Install Dependencies
+## Setup and Build
 
-1. Clone this repository to `$GOPATH/src/github.com/aerogear/aerogear-metrics-api`
+In Go, projects are typically kept in a [workspace](https://golang.org/doc/code.html#Workspaces) that follows a very specific architecture. Before cloning this repo, be sure you have a `GOPATH` env var that points to your workspace folder, say:
+
 ```sh
-mkdir -p $GOPATH/src/github.com/aerogear
-cd $GOPATH/src/github.com/aerogear
-git clone git@github.com:aerogear/aerogear-metrics-api.git
+$ echo $GOPATH
+/Users/JohnDoe/workspaces/go
 ```
 
-2. Run the following command install dependencies
+Then clone this repository by running:
+
 ```
-dep ensure
+git clone git@github.com:aerogear/aerogear-metrics-api.git $GOPATH/src/github.com/aerogear
+```
+
+And finally install dependencies:
+```
+make setup
+```
+
+It is also possible to build the binaries by simply running:
+```
+make build
 ```
 
 ## How to Run
 
-Use `docker-compose` to start the PostgreSQL container:
+In two different terminals:
+
+1. Start the PostgreSQL container using `docker-compose up`:
 
 ```
-cd deployments/docker
-docker-compose up
+docker-compose -f deployments/docker/docker-compose.yml up
 ```
 
-Now you can build and run the application locally with the following command:
+2. Start the server app using `go run`:
 
 ```
 go run cmd/metrics-api/metrics-api.go
+```
+
+You can verify it's running:
+```
+curl http://localhost:3000/healthz
 ```
 
 The default configuration will allow the application to connect to the PostgreSQL container.
@@ -50,21 +67,18 @@ cd deployments/docker
 docker build -t aerogear/aerogear-metrics-api .
 ```
 
-## Build binary
-Run:
-```
-make build
-```
-
 ## Release
 
-Builds and publish to github releases using `goreleaser`.
-See `.goreleaser.yml` for configuration
+Build and publish to github releases using `goreleaser`, see `.goreleaser.yml` for configuration.
 
-Preparing release:
+First make sure you have this tool installed: [Intalling Goreleaser](https://goreleaser.com/#introduction.installing_goreleaser).
+
+Then tag your release, replacing `x` with the appropriate version:
 ```
-brew install goreleaser
-## Replace x with version
-git tag -a v0.0.X -m "Release 0.0.x"
+git tag -a v0.0.x -m "Release 0.0.x"
+```
+
+And make the release:
+```
 make release
 ```

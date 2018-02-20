@@ -2,16 +2,6 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/aerogear/aerogear-metrics-api"
-  packages = [
-    "pkg/dao",
-    "pkg/mobile",
-    "pkg/web"
-  ]
-  revision = "79062a57064feab75efe8c4e4ab6f24239d3d1c3"
-
-[[projects]]
   name = "github.com/darahayes/go-boom"
   packages = ["."]
   revision = "593134141157b11f33ed91c68cc279e9e3ae539c"
@@ -32,6 +22,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2ad010c9f6188877efe08ac35ff10a02ba4d4202c8a78e489a1d560a60fc4dbc"
+  inputs-digest = "09ecedeaf3837572256e692f5337023e880d3e28b02063de6ec115e1984e3c7b"
   solver-name = "gps-cdcl"
   solver-version = 1
