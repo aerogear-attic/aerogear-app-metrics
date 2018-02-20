@@ -5,6 +5,7 @@ TEST_DIRS     ?= $(shell sh -c "find $(TOP_SRC_DIRS) -name \\*_test.go \
 BIN_DIR := $(GOPATH)/bin
 SHELL = /bin/bash
 BINARY = metrics
+LINUX_BINARY = metrics_linux_amd_64
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
@@ -17,11 +18,15 @@ build: setup build_binary
 
 .PHONY: build_binary_linux
 build_binary_linux:
-	env GOOS=linux GOARCH=amd64 go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
+	env GOOS=linux GOARCH=amd64 go build -o $(LINUX_BINARY) ./cmd/metrics-api/metrics-api.go
 
 .PHONY: build_binary
 build_binary:
 	go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
+
+.PHONY: docker_build
+docker_build: setup build_binary_linux
+	docker build -t aerogear-metrics-api --build-arg BINARY=$(LINUX_BINARY)  -f deployments/docker/Dockerfile .
 
 .PHONY: test-unit
 test-unit:

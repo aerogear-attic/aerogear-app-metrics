@@ -1,4 +1,5 @@
 vendor/
 .idea/
 metrics
+metrics_linux_amd_64
 dist/
