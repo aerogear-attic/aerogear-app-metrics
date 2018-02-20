@@ -6,6 +6,7 @@ BIN_DIR := $(GOPATH)/bin
 SHELL = /bin/bash
 BINARY = metrics
 LINUX_BINARY = metrics_linux_amd_64
+IMAGE_NAME = aerogear/aerogear-metrics-api
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
@@ -26,7 +27,7 @@ build_binary:
 
 .PHONY: docker_build
 docker_build: setup build_binary_linux
-	docker build -t aerogear-metrics-api --build-arg BINARY=$(LINUX_BINARY)  -f deployments/docker/Dockerfile .
+	docker build -t $(IMAGE_NAME) --build-arg BINARY=$(LINUX_BINARY)  -f deployments/docker/Dockerfile .
 
 .PHONY: test-unit
 test-unit:
