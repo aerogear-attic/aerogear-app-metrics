@@ -50,7 +50,7 @@ func main() {
 	}
 	//health route
 	{
-		healthHandler := web.NewHealthHandler()
+		healthHandler := web.NewHealthHandler(metricsDao)
 		web.HealthzRoute(router, healthHandler)
 	}
 
