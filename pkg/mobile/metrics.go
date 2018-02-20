@@ -9,5 +9,5 @@ func NewMetricsService(dao MetricCreator) *MetricsService {
 }
 
 func (m MetricsService) Create(metric Metric) (Metric, error) {
-	return metric, nil
+	return metric, m.mdao.Create(metric)
 }
