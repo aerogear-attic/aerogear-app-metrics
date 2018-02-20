@@ -12,5 +12,6 @@
 
 ## Specifications
 
-  - Core SDK Version:
-  - Relevant Service Modules:
+  - Metrics API version:
+  - Database Version:
+  - Operating System:
