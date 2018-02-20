@@ -1,0 +1,4 @@
+FROM centos:latest AS debug
+ARG BINARY=./metrics
+ADD ${BINARY} /opt/metrics
+CMD ["/opt/metrics"]
