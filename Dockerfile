@@ -16,10 +16,3 @@ FROM centos:latest AS local
 COPY --from=builder /opt/metrics /opt/metrics
 RUN chmod +x /opt/metrics
 CMD ["/opt/metrics"]
-
-FROM centos:latest AS prod
-ARG version=latest
-# TODO: test with actual release binary
-ADD https://github.com/aerogear/aerogear-metrics-api/archive/${version}.tar.gz .
-RUN ["tar", "-xvf", "${version}.tar.gz"]
-CMD ["metrics"]
