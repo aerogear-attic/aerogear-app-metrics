@@ -22,7 +22,7 @@ $ echo $GOPATH
 Then clone this repository by running:
 
 ```
-git clone git@github.com:aerogear/aerogear-metrics-api.git $GOPATH/src/github.com/aerogear
+git clone git@github.com:aerogear/aerogear-metrics-api.git $GOPATH/src/github.com/aerogear/aerogear-metrics-api
 ```
 
 And finally install dependencies:
