@@ -14,7 +14,7 @@ func main() {
 
 	// Simple helper function to read an environment or return a default value
 	getEnv := func(key string, defaultVal string) string {
-		if value := os.Getenv(key); value != "" {
+		if value, ok := os.LookupEnv(key); ok {
 			return value
 		}
 		return defaultVal
