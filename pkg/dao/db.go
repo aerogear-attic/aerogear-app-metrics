@@ -46,10 +46,7 @@ func DoInitialSetup() error {
 	if db == nil {
 		return errors.New("cannot setup database, must call Connect() first")
 	}
-	if _, err := db.Exec("CREATE TABLE IF NOT EXISTS sdkVersionForClient(clientId varchar(10) not null primary key, version varchar(40) not null, event_time timestamp with time zone)"); err != nil {
-		return err
-	}
-	if _, err := db.Exec("CREATE TABLE IF NOT EXISTS mobileAppMetrics(clientId varchar(10) not null, event_time timestamp with time zone not null, data jsonb)"); err != nil {
+	if _, err := db.Exec("CREATE TABLE IF NOT EXISTS mobileappmetrics(clientId varchar(30) NOT NULL, event_time timestamptz NOT NULL DEFAULT now() Not NULL, data jsonb)"); err != nil {
 		return err
 	}
 	return nil

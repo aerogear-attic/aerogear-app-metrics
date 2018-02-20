@@ -7,10 +7,14 @@ type AppConfig struct {
 // ClientMetric struct is what the client payload should be parsed into
 // Need to figure out how to structure this
 type Metric struct {
-	ClientTimestamp int64        `json:"timestamp"`
-	ClientId        string       `json:"clientId"`
-	App             AppMetric    `json:"app"`
-	Device          DeviceMetric `json:"device"`
+	ClientTimestamp int64      `json:"timestamp"`
+	ClientId        string     `json:"clientId"`
+	Data            MetricData `json:"data"`
+}
+
+type MetricData struct {
+	App    AppMetric    `json:"app"`
+	Device DeviceMetric `json:"device"`
 }
 
 type AppMetric struct {
