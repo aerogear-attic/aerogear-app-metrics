@@ -1,16 +1,25 @@
-FROM golang:latest
+FROM golang:latest AS builder
 
 # Output location for make build
-ENV BINARY=/metrics-api/metrics-api
-
 RUN mkdir -p /go/src/github.com/aerogear/aerogear-metrics-api/
-RUN mkdir /metrics-api
+ENV BINARY=/opt/metrics
 
 COPY . /go/src/github.com/aerogear/aerogear-metrics-api/
 
 WORKDIR /go/src/github.com/aerogear/aerogear-metrics-api/
 
 RUN go get github.com/golang/dep/cmd/dep
-RUN make build
+RUN make setup
+RUN make build_binary_linux
 
-CMD ["/metrics-api/metrics-api"]
+FROM centos:latest AS local
+COPY --from=builder /opt/metrics /opt/metrics
+RUN chmod +x /opt/metrics
+CMD ["/opt/metrics"]
+
+FROM centos:latest AS prod
+ARG version=latest
+# TODO: test with actual release binary
+ADD https://github.com/aerogear/aerogear-metrics-api/archive/${version}.tar.gz .
+RUN ["tar", "-xvf", "${version}.tar.gz"]
+CMD ["metrics"]
