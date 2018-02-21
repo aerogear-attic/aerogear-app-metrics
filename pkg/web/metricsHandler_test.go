@@ -9,18 +9,16 @@ import (
 	"net/http/httptest"
 	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 	"bytes"
-	"reflect"
+	"github.com/stretchr/testify/mock"
 )
 
-type StubMetricsService struct {
-	recorded            mobile.Metric
-	createMethodInvoked bool
+type MockMetricsService struct {
+	mock.Mock
 }
 
-func (sms *StubMetricsService) Create(metric mobile.Metric) (mobile.Metric, error) {
-	sms.recorded = metric
-	sms.createMethodInvoked = true
-	return metric, nil
+func (m *MockMetricsService) Create(metric mobile.Metric) (mobile.Metric, error) {
+	args := m.Called(metric)
+	return args.Get(0).(mobile.Metric), args.Error(1)
 }
 
 func setupMetricsHandler(service MetricsServiceInterface) *httptest.Server {
@@ -52,9 +50,10 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 		t.Fatal("unable to marshal metric", err)
 	}
 
-	stubMetricsService := &StubMetricsService{}
+	mockMetricsService := new(MockMetricsService)
+	mockMetricsService.On("Create", metric).Return(metric, nil)
 
-	s := setupMetricsHandler(stubMetricsService)
+	s := setupMetricsHandler(mockMetricsService)
 	defer s.Close()
 
 	res, err := http.Post(s.URL+"/metrics", "application/json", byteBuffer)
@@ -69,23 +68,16 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 		t.Fatal("expected an 200 status")
 	}
 
-	if !stubMetricsService.createMethodInvoked {
-		t.Fatal("nothing sent to metrics service")
-	}
-
-	if !reflect.DeepEqual(stubMetricsService.recorded, metric) {
-		t.Fatal("unexpected metrics sent to metrics service")
-	}
-
+	mockMetricsService.AssertExpectations(t)
 }
 
 func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsEmpty(t *testing.T) {
-	stubMetricsService := &StubMetricsService{}
+	mockMetricsService := new(MockMetricsService)
 
-	s := setupMetricsHandler(stubMetricsService)
+	s := setupMetricsHandler(mockMetricsService)
 	defer s.Close()
 
-	res, err := http.Post(s.URL+"/metrics", "application/json", nil)
+	res, err := http.Post(s.URL+"/metrics", "application/json", nil) // empty request body
 	if err != nil {
 		t.Fatal("did not expect an error posting metrics", err)
 	}
@@ -97,25 +89,17 @@ func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsEmpt
 		t.Fatal("expected an 400 status")
 	}
 
-	expected := mobile.Metric{}
-
-	if stubMetricsService.createMethodInvoked {
-		t.Fatal("shouldn't have interacted with metrics service")
-	}
-
-	if stubMetricsService.recorded != expected {
-		t.Fatal("unexpected metrics sent to metrics service")
-	}
+	mockMetricsService.AssertNotCalled(t, "Create")
 }
 
 func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsInvalidJSON(t *testing.T) {
-	stubMetricsService := &StubMetricsService{}
+	mockMetricsService := new(MockMetricsService)
 
-	s := setupMetricsHandler(stubMetricsService)
+	s := setupMetricsHandler(mockMetricsService)
 	defer s.Close()
 
 	byteBuffer := new(bytes.Buffer)
-	byteBuffer.WriteString("nonsense")
+	byteBuffer.WriteString("nonsense") // invalid JSON
 
 	res, err := http.Post(s.URL+"/metrics", "application/json", byteBuffer)
 	if err != nil {
@@ -129,13 +113,5 @@ func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsInva
 		t.Fatal("expected an 400 status")
 	}
 
-	expected := mobile.Metric{}
-
-	if stubMetricsService.createMethodInvoked {
-		t.Fatal("shouldn't have interacted with metrics service")
-	}
-
-	if stubMetricsService.recorded != expected {
-		t.Fatal("unexpected metrics sent to metrics service")
-	}
+	mockMetricsService.AssertNotCalled(t, "Create")
 }
