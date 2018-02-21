@@ -14,20 +14,22 @@ type healthResponse struct {
 	Status    string    `json:"status"`
 }
 
-type HealthHandler struct {
-	pingTarget Pingable
+type healthHandler struct {
+	healthCheckTarget HealthCheckable
 }
 
 // NewHealthHandler creates a handler for the Health endpoints
-// pingTarget must contain an implementation that will be utilized to signal that
+// healthCheckTarget must contain an implementation that will be utilized to signal that
 // the service is ready to accept requests.
-func NewHealthHandler(pingTarget Pingable) *HealthHandler {
-	return &HealthHandler{
-		pingTarget: pingTarget,
+func NewHealthHandler(healthCheckTarget HealthCheckable) *healthHandler {
+	return &healthHandler{
+		healthCheckTarget: healthCheckTarget,
 	}
 }
 
-func (hh *HealthHandler) Healthz(w http.ResponseWriter, r *http.Request) {
+// Healthz is the implementation for a liveness endpoint.
+// It signals the process is up and running but doesn't guarantee connectivity
+func (hh *healthHandler) Healthz(w http.ResponseWriter, r *http.Request) {
 	status := healthResponse{
 		Timestamp: time.Now().UTC(),
 		Status:    "ok",
@@ -39,9 +41,12 @@ func (hh *HealthHandler) Healthz(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (hh *HealthHandler) Ping(w http.ResponseWriter, r *http.Request) {
-	err := hh.pingTarget.Ping()
-	if err != nil {
+// Ping is the implementation for a readiness endpoint.
+// It signals this process is ready to accept connections
+// and respond to API requests
+func (hh *healthHandler) Ping(w http.ResponseWriter, r *http.Request) {
+	healthy, _ := hh.healthCheckTarget.IsHealthy()
+	if !healthy {
 		boom.ServerUnavailable(w)
 		return
 	}

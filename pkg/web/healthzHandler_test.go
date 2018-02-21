@@ -9,75 +9,72 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/aerogear/aerogear-metrics-api/pkg/mock_web"
-	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
+// MockHealthCheckable implements HealthCheckable interface
+type MockHealthCheckable struct {
+	mock.Mock
+}
+
+// IsHealthy provides a mock function with given fields:
+func (_m *MockHealthCheckable) IsHealthy() (bool, error) {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 func TestHealthz(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
+	checkable := &MockHealthCheckable{}
 
-	mockPingable := mock_web.NewMockPingable(mockCtrl)
+	healthHandler := NewHealthHandler(checkable)
 
-	router := NewRouter()
-	healthHandler := NewHealthHandler(mockPingable)
-	HealthzRoute(router, healthHandler)
-
-	expectOkayHealthResponse(router, "/healthz", t)
+	assert.HTTPSuccess(t, healthHandler.Healthz, "GET", "/healthz", nil, nil)
+	checkable.AssertExpectations(t)
 }
 
 func TestHealthzPing(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
+	checkable := &MockHealthCheckable{}
 
-	mockPingable := mock_web.NewMockPingable(mockCtrl)
+	checkable.On("IsHealthy").Return(true, nil).Times(1)
+	checkable.On("IsHealthy").Return(false, errors.New("db offline")).Times(1)
 
-	router := NewRouter()
-	healthHandler := NewHealthHandler(mockPingable)
+	healthHandler := NewHealthHandler(checkable)
 
-	HealthzRoute(router, healthHandler)
+	assert.HTTPSuccess(t, healthHandler.Ping, "GET", "/healthz/ping", nil, nil)
+	assert.HTTPError(t, healthHandler.Ping, "GET", "/healthz/ping", nil, nil)
 
-	gomock.InOrder(
-		mockPingable.EXPECT().Ping().Return(nil),
-		mockPingable.EXPECT().Ping().Return(errors.New("no db")),
-	)
-
-	expectOkayHealthResponse(router, "/healthz/ping", t)
-	expectErrorResponse(router, "/healthz/ping", t)
+	checkable.AssertExpectations(t)
 }
 
-func expectOkayHealthResponse(router http.Handler, url string, t *testing.T) {
-	s := httptest.NewServer(router)
-	defer s.Close()
+func expectOkayHealthResponse(handler http.HandlerFunc, url string, t *testing.T) {
+	request := httptest.NewRequest("GET", url, nil)
+	w := httptest.NewRecorder()
+	handler(w, request)
 
-	res, err := http.Get(s.URL + url)
-	if err != nil {
-		t.Fatal("did not expect an error", err)
-	}
-	defer res.Body.Close()
-
+	res := w.Result()
 	body, err := ioutil.ReadAll(res.Body)
+	assert.Nil(t, err)
+
 	response := &healthResponse{}
 	if err := json.Unmarshal(body, response); err != nil {
 		t.Fatal("failed to unmarshal response body", err)
 	}
 
-	if response.Status != "ok" {
-		t.Fatal("expected an ok status")
-	}
-}
-
-func expectErrorResponse(router http.Handler, url string, t *testing.T) {
-	s := httptest.NewServer(router)
-	defer s.Close()
-
-	res, err := http.Get(s.URL + url)
-	if err != nil {
-		t.Fatal("did not expect an error", err)
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode < 400 {
-		t.Fatal("expected an error HTTP status", res.StatusCode)
-	}
+	assert.Equal(t, 200, res.StatusCode)
 }

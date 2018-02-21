@@ -3,15 +3,16 @@ package web
 import (
 	"testing"
 
+	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"bytes"
-	"errors"
+
 	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/assert"
+	mock "github.com/stretchr/testify/mock"
 )
 
 type MockMetricsService struct {

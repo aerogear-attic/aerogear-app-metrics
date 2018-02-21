@@ -6,6 +6,6 @@ type MetricsServiceInterface interface {
 	Create(m mobile.Metric) (mobile.Metric, error)
 }
 
-type Pingable interface {
-	Ping() error
+type HealthCheckable interface {
+	IsHealthy() (bool, error)
 }
