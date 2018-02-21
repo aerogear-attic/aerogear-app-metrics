@@ -42,13 +42,6 @@ func Disconnect() error {
 	return nil
 }
 
-func Ping() error {
-	if db == nil {
-		return errors.New("Database not initialized, call Connect()")
-	}
-	return db.Ping()
-}
-
 func DoInitialSetup() error {
 	if db == nil {
 		return errors.New("cannot setup database, must call Connect() first")
