@@ -7,11 +7,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 	"bytes"
+	"errors"
+	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/assert"
-	"github.com/pkg/errors"
 )
 
 type MockMetricsService struct {
