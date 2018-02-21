@@ -23,6 +23,13 @@ func (sms *StubMetricsService) Create(metric mobile.Metric) (mobile.Metric, erro
 	return metric, nil
 }
 
+func setupMetricsHandler(service MetricsServiceInterface) *httptest.Server {
+	router := NewRouter()
+	metricsHandler := NewMetricsHandler(service)
+	MetricsRoute(router, metricsHandler)
+	return httptest.NewServer(router)
+}
+
 func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 	metric := mobile.Metric{
 		ClientTimestamp: 1234,
@@ -47,11 +54,9 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 
 	stubMetricsService := &StubMetricsService{}
 
-	router := NewRouter()
-	metricsHandler := NewMetricsHandler(stubMetricsService)
-	MetricsRoute(router, metricsHandler)
-	s := httptest.NewServer(router)
+	s := setupMetricsHandler(stubMetricsService)
 	defer s.Close()
+
 	res, err := http.Post(s.URL+"/metrics", "application/json", byteBuffer)
 	if err != nil {
 		t.Fatal("did not expect an error posting metrics", err)
@@ -77,11 +82,9 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsEmpty(t *testing.T) {
 	stubMetricsService := &StubMetricsService{}
 
-	router := NewRouter()
-	metricsHandler := NewMetricsHandler(stubMetricsService)
-	MetricsRoute(router, metricsHandler)
-	s := httptest.NewServer(router)
+	s := setupMetricsHandler(stubMetricsService)
 	defer s.Close()
+
 	res, err := http.Post(s.URL+"/metrics", "application/json", nil)
 	if err != nil {
 		t.Fatal("did not expect an error posting metrics", err)
@@ -108,10 +111,7 @@ func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsEmpt
 func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsInvalidJSON(t *testing.T) {
 	stubMetricsService := &StubMetricsService{}
 
-	router := NewRouter()
-	metricsHandler := NewMetricsHandler(stubMetricsService)
-	MetricsRoute(router, metricsHandler)
-	s := httptest.NewServer(router)
+	s := setupMetricsHandler(stubMetricsService)
 	defer s.Close()
 
 	byteBuffer := new(bytes.Buffer)
