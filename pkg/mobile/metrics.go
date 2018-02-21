@@ -11,7 +11,6 @@ func NewMetricsService(dao MetricCreator) *MetricsService {
 }
 
 func (m MetricsService) Create(metric Metric) (Metric, error) {
-
 	metricsData, err := json.Marshal(metric.Data)
 
 	if err != nil {
