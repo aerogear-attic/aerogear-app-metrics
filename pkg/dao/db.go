@@ -12,11 +12,13 @@ type DatabaseHandler struct {
 	DB *sql.DB
 }
 
+const mobileMetricsTable = "mobileappmetrics"
+
 func (handler *DatabaseHandler) Connect(dbHost, dbUser, dbPassword, dbName, sslMode string) error {
 	if handler.DB != nil {
 		return nil
 	}
-	//connection logic
+
 	connStr := fmt.Sprintf("host=%v user=%v password=%v dbname=%v sslmode=%v", dbHost, dbUser, dbPassword, dbName, sslMode)
 
 	// sql.Open doesn't initialize the connection immediately
@@ -32,7 +34,6 @@ func (handler *DatabaseHandler) Connect(dbHost, dbUser, dbPassword, dbName, sslM
 		return err
 	}
 
-	// assign db variable declared above
 	handler.DB = dbInstance
 	return nil
 }
