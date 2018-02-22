@@ -2,9 +2,6 @@ package dao
 
 import (
 	"database/sql"
-	"encoding/json"
-
-	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 )
 
 type MetricsDAO struct {
@@ -12,14 +9,8 @@ type MetricsDAO struct {
 }
 
 // Create a metrics record
-func (m *MetricsDAO) Create(metric mobile.Metric) error {
-	data, err := json.Marshal(metric.Data)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.Exec("INSERT INTO mobileappmetrics(clientId, data) VALUES($1, $2)", metric.ClientId, data)
+func (m *MetricsDAO) Create(clientId string, metricsData []byte) error {
+	_, err := db.Exec("INSERT INTO mobileappmetrics(clientId, data) VALUES($1, $2)", clientId, metricsData)
 	return err
 }
 
