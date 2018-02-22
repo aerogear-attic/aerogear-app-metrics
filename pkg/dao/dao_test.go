@@ -13,7 +13,7 @@ type MockDB struct {
 	mock.Mock
 }
 
-func TestIshealthy(t *testing.T) {
+func TestIsHealthy(t *testing.T) {
 	config := config.GetConfig()
 	dbHandler := DatabaseHandler{}
 
@@ -36,7 +36,7 @@ func TestIshealthy(t *testing.T) {
 	}
 }
 
-func TestIshealthyWhenDisconnected(t *testing.T) {
+func TestIsHealthyWhenDisconnected(t *testing.T) {
 	config := config.GetConfig()
 	dbHandler := DatabaseHandler{}
 
@@ -66,6 +66,11 @@ func TestCreate(t *testing.T) {
 	dbHandler := DatabaseHandler{}
 
 	err := dbHandler.Connect(config.DBHost, config.DBUser, config.DBPassword, config.DBName, config.SSLMode)
+
+	if err != nil {
+		t.Errorf("Connect() returned an error: %s", err.Error())
+	}
+
 	dbHandler.DoInitialSetup()
 
 	if err != nil {
