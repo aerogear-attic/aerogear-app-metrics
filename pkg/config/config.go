@@ -25,7 +25,7 @@ func getEnv(key string, defaultVal string) string {
 func GetConfig() *config {
 	return &config{
 		DBHost:        getEnv("PGHOST", "localhost"),
-		DBUser:        getEnv("PGPORT", "postgres"),
+		DBUser:        getEnv("PGUSER", "postgres"),
 		DBPassword:    getEnv("PGPASSWORD", "postgres"),
 		DBName:        getEnv("PGDATABASE", "aerogear_mobile_metrics"),
 		SSLMode:       getEnv("PGSSLMODE", "disable"),
