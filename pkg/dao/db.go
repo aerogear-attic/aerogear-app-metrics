@@ -46,9 +46,6 @@ func DoInitialSetup() error {
 	if db == nil {
 		return errors.New("cannot setup database, must call Connect() first")
 	}
-	if _, err := db.Exec("CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;"); err != nil {
-		return err
-	}
 	if _, err := db.Exec("CREATE TABLE IF NOT EXISTS mobileappmetrics(clientId varchar(30) NOT NULL, event_time timestamptz NOT NULL DEFAULT now() Not NULL, data jsonb)"); err != nil {
 		return err
 	}
