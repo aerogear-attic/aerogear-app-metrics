@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/aerogear/aerogear-metrics-api/pkg/config"
 	"github.com/aerogear/aerogear-metrics-api/pkg/dao"
 	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 	"github.com/aerogear/aerogear-metrics-api/pkg/web"
@@ -12,23 +12,9 @@ import (
 
 func main() {
 
-	// Simple helper function to read an environment or return a default value
-	getEnv := func(key string, defaultVal string) string {
-		if value := os.Getenv(key); value != "" {
-			return value
-		}
-		return defaultVal
-	}
+	config := config.GetConfig()
 
-	var (
-		dbHost     = getEnv("PGHOST", "localhost")
-		dbUser     = getEnv("PGPORT", "postgres")
-		dbPassword = getEnv("PGPASSWORD", "postgres")
-		dbName     = getEnv("PGDATABASE", "aerogear_mobile_metrics")
-		sslMode    = getEnv("PGSSLMODE", "disable")
-	)
-
-	db, err := dao.Connect(dbHost, dbUser, dbPassword, dbName, sslMode)
+	db, err := dao.Connect(config.DBHost, config.DBUser, config.DBPassword, config.DBName, config.SSLMode)
 
 	if err != nil {
 		panic("failed to connect to sql database : " + err.Error())
