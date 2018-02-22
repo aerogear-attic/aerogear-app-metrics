@@ -1,15 +1,10 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"reflect"
 	"testing"
 )
-
-func TestgetEnv(t *testing.T) {
-
-}
 
 func TestGetConfig(t *testing.T) {
 	expected := map[string]string{
@@ -47,8 +42,6 @@ func TestGetConfigCustomEnvVariables(t *testing.T) {
 
 	config := GetConfig()
 
-	fmt.Println(config)
-
 	if !reflect.DeepEqual(config, expected) {
 		t.Error("GetConfig() did not return expected result")
 	}
@@ -72,8 +65,6 @@ func TestGetConfigEmptyEnvVariables(t *testing.T) {
 	os.Setenv("PORT", "")
 
 	config := GetConfig()
-
-	fmt.Println(config)
 
 	if !reflect.DeepEqual(config, expected) {
 		t.Error("GetConfig() did not return expected result")
