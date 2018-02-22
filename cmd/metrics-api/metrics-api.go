@@ -14,18 +14,20 @@ func main() {
 
 	config := config.GetConfig()
 
-	db, err := dao.Connect(config.DBHost, config.DBUser, config.DBPassword, config.DBName, config.SSLMode)
+	dbHandler := dao.DatabaseHandler{}
+
+	err := dbHandler.Connect(config.DBHost, config.DBUser, config.DBPassword, config.DBName, config.SSLMode)
 
 	if err != nil {
 		panic("failed to connect to sql database : " + err.Error())
 	}
-	defer db.Close()
+	defer dbHandler.DB.Close()
 
-	if err := dao.DoInitialSetup(); err != nil {
+	if err := dbHandler.DoInitialSetup(); err != nil {
 		panic("failed to perform database setup : " + err.Error())
 	}
 
-	metricsDao := dao.NewMetricsDAO(db)
+	metricsDao := dao.NewMetricsDAO(dbHandler.DB)
 	router := web.NewRouter()
 
 	//metrics route

@@ -8,11 +8,15 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+// var db *sql.DB
 
-func Connect(dbHost, dbUser, dbPassword, dbName, sslMode string) (*sql.DB, error) {
-	if db != nil {
-		return db, nil
+type DatabaseHandler struct {
+	DB *sql.DB
+}
+
+func (handler *DatabaseHandler) Connect(dbHost, dbUser, dbPassword, dbName, sslMode string) error {
+	if handler.DB != nil {
+		return nil
 	}
 	//connection logic
 	connStr := fmt.Sprintf("host=%v user=%v password=%v dbname=%v sslmode=%v", dbHost, dbUser, dbPassword, dbName, sslMode)
@@ -22,31 +26,31 @@ func Connect(dbHost, dbUser, dbPassword, dbName, sslMode string) (*sql.DB, error
 
 	// an error can happen here if the connection string is invalid
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// an error happens here if we cannot connect
 	if err = dbInstance.Ping(); err != nil {
-		return nil, err
+		return err
 	}
 
 	// assign db variable declared above
-	db = dbInstance
-	return dbInstance, nil
+	handler.DB = dbInstance
+	return nil
 }
 
-func Disconnect() error {
-	if db != nil {
-		return db.Close()
+func (handler *DatabaseHandler) Disconnect() error {
+	if handler.DB != nil {
+		return handler.DB.Close()
 	}
 	return nil
 }
 
-func DoInitialSetup() error {
-	if db == nil {
+func (handler *DatabaseHandler) DoInitialSetup() error {
+	if handler.DB == nil {
 		return errors.New("cannot setup database, must call Connect() first")
 	}
-	if _, err := db.Exec("CREATE TABLE IF NOT EXISTS mobileappmetrics(clientId varchar(30) NOT NULL, event_time timestamptz NOT NULL DEFAULT now() Not NULL, data jsonb)"); err != nil {
+	if _, err := handler.DB.Exec("CREATE TABLE IF NOT EXISTS mobileappmetrics(clientId varchar(30) NOT NULL CHECK (clientId <> ''), event_time timestamptz NOT NULL DEFAULT now() Not NULL, data jsonb)"); err != nil {
 		return err
 	}
 	return nil
