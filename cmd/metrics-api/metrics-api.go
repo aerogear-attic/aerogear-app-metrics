@@ -40,12 +40,10 @@ func main() {
 		web.HealthzRoute(router, healthHandler)
 	}
 
-	listenAddress := ":3000"
-
-	log.Printf("Starting application... going to listen on %v", listenAddress)
+	log.Printf("Starting application... going to listen on %v", config.ListenAddress)
 
 	//start
-	if err := http.ListenAndServe(listenAddress, router); err != nil {
+	if err := http.ListenAndServe(config.ListenAddress, router); err != nil {
 		panic("failed to start " + err.Error())
 	}
 }
