@@ -5,15 +5,6 @@ import (
 	"os"
 )
 
-type config struct {
-	DBHost        string
-	DBUser        string
-	DBPassword    string
-	DBName        string
-	SSLMode       string
-	ListenAddress string
-}
-
 // Simple helper function to read an environment or return a default value
 func getEnv(key string, defaultVal string) string {
 	if value := os.Getenv(key); value != "" {
@@ -22,13 +13,13 @@ func getEnv(key string, defaultVal string) string {
 	return defaultVal
 }
 
-func GetConfig() *config {
-	return &config{
-		DBHost:        getEnv("PGHOST", "localhost"),
-		DBUser:        getEnv("PGUSER", "postgres"),
-		DBPassword:    getEnv("PGPASSWORD", "postgres"),
-		DBName:        getEnv("PGDATABASE", "aerogear_mobile_metrics"),
-		SSLMode:       getEnv("PGSSLMODE", "disable"),
-		ListenAddress: fmt.Sprintf(":%s", getEnv("PORT", "3000")),
+func GetConfig() map[string]string {
+	return map[string]string{
+		"DBHost":        getEnv("PGHOST", "localhost"),
+		"DBUser":        getEnv("PGUSER", "postgres"),
+		"DBPassword":    getEnv("PGPASSWORD", "postgres"),
+		"DBName":        getEnv("PGDATABASE", "aerogear_mobile_metrics"),
+		"SSLMode":       getEnv("PGSSLMODE", "disable"),
+		"ListenAddress": fmt.Sprintf(":%s", getEnv("PORT", "3000")),
 	}
 }
