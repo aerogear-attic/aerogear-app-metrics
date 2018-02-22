@@ -116,6 +116,11 @@ func TestCreateEmptyClientID(t *testing.T) {
 	dbHandler := DatabaseHandler{}
 
 	err := dbHandler.Connect(config.DBHost, config.DBUser, config.DBPassword, config.DBName, config.SSLMode)
+
+	if err != nil {
+		t.Errorf("Connect() returned an error: %s", err.Error())
+	}
+
 	dbHandler.DoInitialSetup()
 
 	if err != nil {
