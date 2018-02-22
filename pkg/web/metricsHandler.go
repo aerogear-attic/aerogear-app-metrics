@@ -9,10 +9,10 @@ import (
 )
 
 type metricsHandler struct {
-	metricService *mobile.MetricsService
+	metricService MetricsServiceInterface
 }
 
-func NewMetricsHandler(ms *mobile.MetricsService) *metricsHandler {
+func NewMetricsHandler(ms MetricsServiceInterface) *metricsHandler {
 	return &metricsHandler{metricService: ms}
 }
 

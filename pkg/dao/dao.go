@@ -14,10 +14,11 @@ func (m *MetricsDAO) Create(clientId string, metricsData []byte) error {
 	return err
 }
 
-// Ping checks that we are connected to the database
+// IsHealthy checks that we are connected to the database
 // This will be used by the healthcheck
-func (m *MetricsDAO) Ping() error {
-	return m.db.Ping()
+func (m *MetricsDAO) IsHealthy() (bool, error) {
+	err := m.db.Ping()
+	return err == nil, err
 }
 
 func NewMetricsDAO(db *sql.DB) *MetricsDAO {
