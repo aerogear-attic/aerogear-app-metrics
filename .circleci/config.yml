@@ -31,5 +31,5 @@ jobs:
       - run: go get github.com/mattn/goveralls
       - run: go get -u github.com/golang/dep/cmd/dep
       - run: dep ensure
-      - run: make test-integration
-      - run: /go/bin/goveralls -service=circle-ci -repotoken=$COVERALLS_TOKEN
+      - run: make test-integration-cover
+      - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
