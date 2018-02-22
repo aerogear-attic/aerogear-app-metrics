@@ -8,8 +8,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// var db *sql.DB
-
 type DatabaseHandler struct {
 	DB *sql.DB
 }
