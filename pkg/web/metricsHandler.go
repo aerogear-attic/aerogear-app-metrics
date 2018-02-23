@@ -27,6 +27,11 @@ func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if valid, reason := metric.Validate(); !valid {
+		boom.BadRequest(w, reason)
+		return
+	}
+
 	// create the record in the db
 	result, err := mh.metricService.Create(metric)
 
