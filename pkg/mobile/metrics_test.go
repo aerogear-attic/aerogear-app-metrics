@@ -30,13 +30,13 @@ func TestCreateCallsDAOWithCorrectArgs(t *testing.T) {
 
 	metric := Metric{
 		ClientId: "org.aerogear.metrics.tests",
-		Data: MetricData{
-			App: AppMetric{
+		Data: &MetricData{
+			App: &AppMetric{
 				ID:         "12345678",
 				SDKVersion: "1.0.0",
 				AppVersion: "1",
 			},
-			Device: DeviceMetric{
+			Device: &DeviceMetric{
 				Platform:        "Android",
 				PlatformVersion: "27",
 			},
@@ -69,13 +69,13 @@ func TestCreateReturnsErrorFromDAO(t *testing.T) {
 
 	metric := Metric{
 		ClientId: "org.aerogear.metrics.tests",
-		Data: MetricData{
-			App: AppMetric{
+		Data: &MetricData{
+			App: &AppMetric{
 				ID:         "12345678",
 				SDKVersion: "1.0.0",
 				AppVersion: "1",
 			},
-			Device: DeviceMetric{
+			Device: &DeviceMetric{
 				Platform:        "Android",
 				PlatformVersion: "27",
 			},

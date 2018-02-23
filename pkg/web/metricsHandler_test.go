@@ -35,13 +35,13 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 	metric := mobile.Metric{
 		ClientTimestamp: 1234,
 		ClientId:        "client123",
-		Data: mobile.MetricData{
-			App: mobile.AppMetric{
+		Data: &mobile.MetricData{
+			App: &mobile.AppMetric{
 				ID:         "deadbeef",
 				SDKVersion: "1.2.3",
 				AppVersion: "27",
 			},
-			Device: mobile.DeviceMetric{
+			Device: &mobile.DeviceMetric{
 				Platform:        "android",
 				PlatformVersion: "19",
 			},
@@ -73,13 +73,13 @@ func TestMetricsEndpointShouldReturn500WhenThereIsAnErrorInMetricsService(t *tes
 	metric := mobile.Metric{
 		ClientTimestamp: 1234,
 		ClientId:        "client123",
-		Data: mobile.MetricData{
-			App: mobile.AppMetric{
+		Data: &mobile.MetricData{
+			App: &mobile.AppMetric{
 				ID:         "deadbeef",
 				SDKVersion: "1.2.3",
 				AppVersion: "27",
 			},
-			Device: mobile.DeviceMetric{
+			Device: &mobile.DeviceMetric{
 				Platform:        "android",
 				PlatformVersion: "19",
 			},
