@@ -43,3 +43,5 @@ jobs:
       - run: make release
       - run: make docker_release_build
       - run: make docker_push
+      - store_artifacts:
+        path: dist
