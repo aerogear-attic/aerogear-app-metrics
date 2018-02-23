@@ -12,9 +12,13 @@ COPY . /go/src/github.com/aerogear/aerogear-metrics-api/
 WORKDIR /go/src/github.com/aerogear/aerogear-metrics-api/
 
 RUN make setup
+
+# Disabling cgo forces static linking of c libs, allowing the binary to run
+# in `scratch`
 RUN CGO_ENABLED=0 make build_binary_linux
 RUN chmod +x /opt/metrics
 
 FROM scratch AS local
+EXPOSE 3000
 COPY --from=builder /opt/metrics /opt/metrics
 ENTRYPOINT ["/opt/metrics"]
