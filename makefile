@@ -74,7 +74,7 @@ release: setup
 docker_build: | setup build_linux
 	docker build -t $(TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
 
-.PHONY docker_untar_linux_release
+.PHONY: docker_untar_linux_release
 docker_untar_linux_release:
 	tar -xvf $(BINARY_LINUX_64).tar.gz
 
