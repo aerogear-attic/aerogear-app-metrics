@@ -6,6 +6,11 @@ BIN_DIR := $(GOPATH)/bin
 SHELL = /bin/bash
 BINARY ?= metrics
 
+# This follows the output format for goreleaser
+BINARY_LINUX_64 = ./dist/linux_amd64/metrics
+
+TAG = aerogear/aerogear-metrics-api
+
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
 .PHONY: setup
@@ -13,11 +18,11 @@ setup:
 	dep ensure
 
 .PHONY: build
-build: setup build_binary
+build: | setup build_binary
 
-.PHONY: build_binary_linux
-build_binary_linux:
-	env GOOS=linux GOARCH=amd64 go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
+.PHONY: build_linux
+build_linux:
+	env GOOS=linux GOARCH=amd64 go build -o $(BINARY_LINUX_64) ./cmd/metrics-api/metrics-api.go
 
 .PHONY: build_binary
 build_binary:
@@ -64,5 +69,20 @@ clean:
 .PHONY: release
 release: setup
 	goreleaser --rm-dist
+
+.PHONY: docker_build
+docker_build: | setup build_linux
+	docker build -t $(TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
+
+.PHONY docker_untar_linux_release
+docker_untar_linux_release:
+	tar -xvf $(BINARY_LINUX_64).tar.gz
+
+.PHONY: docker_release_build
+docker_release_build: | setup release docker_untar_linux_release docker_build
+	
+.PHONY: docker_push
+docker_push:
+	docker push $(TAG)
 
 .PHONY: build
