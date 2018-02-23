@@ -7,6 +7,14 @@ jobs:
     docker:
       # specify the version
       - image: circleci/golang:1.9
+
+      - image: postgres:9.5
+        ports:
+          - 5432:5432
+        environment:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: aerogear_mobile_metrics
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -23,5 +31,5 @@ jobs:
       - run: go get github.com/mattn/goveralls
       - run: go get -u github.com/golang/dep/cmd/dep
       - run: dep ensure
-      - run: go test -v -coverpkg=./... ./...
-      - run: /go/bin/goveralls -service=circle-ci -repotoken=$COVERALLS_TOKEN
+      - run: make test-integration-cover
+      - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=$COVERALLS_TOKEN

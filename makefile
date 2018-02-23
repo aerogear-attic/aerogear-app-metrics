@@ -1,6 +1,6 @@
 PKG     = github.com/aerogear/aerogear-metrics-api
 TOP_SRC_DIRS   = pkg
-TEST_DIRS     ?= $(shell sh -c "find $(TOP_SRC_DIRS) -name \\*_test.go \
+PACKAGES     ?= $(shell sh -c "find $(TOP_SRC_DIRS) -name \\*_test.go \
                    -exec dirname {} \\; | sort | uniq")
 BIN_DIR := $(GOPATH)/bin
 SHELL = /bin/bash
@@ -27,7 +27,20 @@ build_binary:
 test-unit:
 	@echo Running tests:
 	go test -v -race -cover $(UNIT_TEST_FLAGS) \
-	  $(addprefix $(PKG)/,$(TEST_DIRS))
+	  $(addprefix $(PKG)/,$(PACKAGES))
+
+.PHONY: test-integration
+test-integration:
+	@echo Running tests:
+	go test -v -race -cover $(UNIT_TEST_FLAGS) -tags=integration \
+	  $(addprefix $(PKG)/,$(PACKAGES))
+
+.PHONY: test-integration-cover
+test-integration-cover:
+	echo "mode: count" > coverage-all.out
+	$(foreach pkg,$(PACKAGES),\
+		go test -tags=integration -coverprofile=coverage.out -covermode=count $(addprefix $(PKG)/,$(pkg));\
+		tail -n +2 coverage.out >> coverage-all.out;)
 
 .PHONY: errcheck
 errcheck:

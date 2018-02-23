@@ -1,10 +1,8 @@
 postgres:
-  image: timescale/timescaledb
+  image: postgres:9.5
   ports:
     - 5432:5432
   environment:
     POSTGRES_PASSWORD: postgres
     POSTGRES_USER: postgres
-    PGDATA : /var/lib/postgresql/data/pgdata
-  volumes:
-    - psqlvolumes:/var/lib/postgresql/data/pgdata
+    POSTGRES_DB: aerogear_mobile_metrics

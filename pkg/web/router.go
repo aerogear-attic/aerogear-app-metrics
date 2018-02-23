@@ -23,7 +23,7 @@ func NewRouter() *mux.Router {
 }
 
 func MetricsRoute(r *mux.Router, handler *metricsHandler) {
-	r.HandleFunc("/default-metrics", handler.CreateMetric).Methods("POST")
+	r.HandleFunc("/metrics", handler.CreateMetric).Methods("POST")
 }
 
 func HealthzRoute(r *mux.Router, handler *healthHandler) {

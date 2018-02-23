@@ -1,20 +1,56 @@
 package dao
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+	"fmt"
 
-var db *sql.DB
+	_ "github.com/lib/pq"
+)
 
-func Connect() (*sql.DB, error) {
-	if db != nil {
-		return db, nil
-	}
-	//connection logic
-	return nil, nil
+type DatabaseHandler struct {
+	DB *sql.DB
 }
 
-func Disconnect() error {
-	if nil != db {
-		return db.Close()
+const mobileMetricsTable = "mobileappmetrics"
+
+func (handler *DatabaseHandler) Connect(dbHost, dbUser, dbPassword, dbName, sslMode string) error {
+	if handler.DB != nil {
+		return nil
+	}
+
+	connStr := fmt.Sprintf("host=%v user=%v password=%v dbname=%v sslmode=%v", dbHost, dbUser, dbPassword, dbName, sslMode)
+
+	// sql.Open doesn't initialize the connection immediately
+	dbInstance, err := sql.Open("postgres", connStr)
+
+	// an error can happen here if the connection string is invalid
+	if err != nil {
+		return err
+	}
+
+	// an error happens here if we cannot connect
+	if err = dbInstance.Ping(); err != nil {
+		return err
+	}
+
+	handler.DB = dbInstance
+	return nil
+}
+
+func (handler *DatabaseHandler) Disconnect() error {
+	if handler.DB != nil {
+		return handler.DB.Close()
+	}
+	return nil
+}
+
+func (handler *DatabaseHandler) DoInitialSetup() error {
+	if handler.DB == nil {
+		return errors.New("cannot setup database, must call Connect() first")
+	}
+	if _, err := handler.DB.Exec("CREATE TABLE IF NOT EXISTS mobileappmetrics(clientId varchar(30) NOT NULL CHECK (clientId <> ''), event_time timestamptz NOT NULL DEFAULT now() Not NULL, data jsonb)"); err != nil {
+		return err
 	}
 	return nil
 }

@@ -2,3 +2,4 @@ vendor/
 .idea/
 metrics
 dist/
+coverage*.out

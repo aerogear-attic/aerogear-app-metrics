@@ -2,9 +2,6 @@ package dao
 
 import (
 	"database/sql"
-	"errors"
-
-	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
 )
 
 type MetricsDAO struct {
@@ -12,26 +9,16 @@ type MetricsDAO struct {
 }
 
 // Create a metrics record
-func (m *MetricsDAO) Create(metric mobile.Metric) (mobile.Metric, error) {
-	return metric, errors.New("Not Implemented yet")
+func (m *MetricsDAO) Create(clientId string, metricsData []byte) error {
+	_, err := m.db.Exec("INSERT INTO mobileappmetrics(clientId, data) VALUES($1, $2)", clientId, metricsData)
+	return err
 }
 
-// Update an existing job
-// Not sure if we need this
-func (m *MetricsDAO) Update() {
-
-}
-
-// Delete an existing job
-// Not sure if we need this
-func (m *MetricsDAO) Delete() {
-
-}
-
-// CheckConnection checks that we are connected to the database
+// IsHealthy checks that we are connected to the database
 // This will be used by the healthcheck
-func (m *MetricsDAO) CheckConnection() {
-
+func (m *MetricsDAO) IsHealthy() (bool, error) {
+	err := m.db.Ping()
+	return err == nil, err
 }
 
 func NewMetricsDAO(db *sql.DB) *MetricsDAO {
