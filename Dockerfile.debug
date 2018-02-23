@@ -1,4 +1,0 @@
-FROM centos:7 AS debug
-ARG BINARY=./metrics
-ADD ${BINARY} /opt/metrics
-ENTRYPOINT ["/opt/metrics"]

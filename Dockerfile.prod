@@ -1,8 +1,0 @@
-FROM centos:7 AS prod
-EXPOSE 3000
-ARG version=latest
-# TODO: test with actual release binary
-ADD https://github.com/aerogear/aerogear-metrics-api/archive/${version}.tar.gz .
-RUN ["tar", "-xvf", "${version}.tar.gz"]
-RUN ["chmod", "+x", "metrics"]
-ENTRYPOINT [ "metrics" ]
