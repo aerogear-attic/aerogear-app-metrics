@@ -9,7 +9,9 @@ BINARY ?= metrics
 # This follows the output format for goreleaser
 BINARY_LINUX_64 = ./dist/linux_amd64/metrics
 
-TAG = aerogear/aerogear-metrics-api
+DOCKER_LATEST_TAG = darahayes/aerogear-metrics-api:latest
+DOCKER_MASTER_TAG = aerogear/aerogear-metrics-api:master
+DOCKER_RELEASE_TAG = darahayes/aerogear-metrics-api:$(CIRCLE_TAG)
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
@@ -18,15 +20,24 @@ setup:
 	dep ensure
 
 .PHONY: build
-build: | setup build_binary
+build: setup
+	go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
 
 .PHONY: build_linux
-build_linux:
+build_linux: setup
 	env GOOS=linux GOARCH=amd64 go build -o $(BINARY_LINUX_64) ./cmd/metrics-api/metrics-api.go
 
-.PHONY: build_binary
-build_binary:
-	go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
+.PHONY: docker_build
+docker_build: build_linux
+	docker build -t $(DOCKER_LATEST_TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
+
+.PHONY: docker_build_release
+docker_build_release:
+	docker build -t $(DOCKER_LATEST_TAG) -t $(DOCKER_RELEASE_TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
+
+.PHONY: docker_build_master
+docker_build_master:
+	docker build -t $(DOCKER_MASTER_TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
 
 .PHONY: test-unit
 test-unit:
@@ -70,19 +81,13 @@ clean:
 release: setup
 	goreleaser --rm-dist
 
-.PHONY: docker_build
-docker_build: | setup build_linux
-	docker build -t $(TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
-
-.PHONY: docker_untar_linux_release
-docker_untar_linux_release:
-	tar -xvf $(BINARY_LINUX_64).tar.gz
-
-.PHONY: docker_release_build
-docker_release_build: | setup release docker_untar_linux_release docker_build
+.PHONY: docker_push_release
+docker_push_release:
+	docker login -u $(DOCKERHUB_USERNAME) -p $(DOCKERHUB_PASSWORD)
+	docker push $(DOCKER_LATEST_TAG)
+	docker push $(DOCKER_RELEASE_TAG)
 	
-.PHONY: docker_push
-docker_push:
-	docker push $(TAG)
-
-.PHONY: build
+.PHONY: docker_push_master
+docker_push_master:
+	docker login -u $(DOCKERHUB_USERNAME) -p $(DOCKERHUB_PASSWORD)
+	docker push $(DOCKER_MASTER_TAG)
