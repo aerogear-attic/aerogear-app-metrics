@@ -41,7 +41,7 @@ jobs:
       - run: go get github.com/goreleaser/goreleaser
       - checkout
       - run: make release
-      - run: make docker_release_build
-      - run: make docker_push
+      - run: make docker_build_release
+      - run: make docker_push_release
       - store_artifacts:
         path: dist
