@@ -12,7 +12,7 @@ jobs:
           - 5432:5432
         environment:
           POSTGRESQL_PASSWORD: postgres
-          POSTGRESQL_USER: postgres
+          POSTGRESQL_USER: postgresql
           POSTGRESQL_DATABASE: aerogear_mobile_metrics
     #### TEMPLATE_NOTE: go expects specific checkout path representing url
     #### expecting it in the form of
