@@ -1,4 +1,4 @@
-# AeroGear Metrics API
+# AeroGear App Metrics
 
 This is the server component of the AeroGear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database. The service is written in [Golang](https://golang.org/).
 
@@ -25,7 +25,7 @@ $ echo $GOPATH
 Then clone this repository by running:
 
 ```
-git clone git@github.com:aerogear/aerogear-metrics-api.git $GOPATH/src/github.com/aerogear/aerogear-metrics-api
+git clone git@github.com:aerogear/aerogear-app-metrics.git $GOPATH/src/github.com/aerogear/aerogear-app-metrics
 ```
 
 And finally install dependencies:

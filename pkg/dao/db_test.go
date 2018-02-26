@@ -5,7 +5,7 @@ package dao
 import (
 	"testing"
 
-	"github.com/aerogear/aerogear-metrics-api/pkg/config"
+	"github.com/aerogear/aerogear-app-metrics/pkg/config"
 )
 
 func TestConnect(t *testing.T) {
