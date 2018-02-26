@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
+	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 	"github.com/darahayes/go-boom"
 )
 

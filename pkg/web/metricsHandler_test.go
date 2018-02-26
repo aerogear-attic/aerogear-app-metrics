@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
+	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 	"github.com/stretchr/testify/assert"
 	mock "github.com/stretchr/testify/mock"
 )

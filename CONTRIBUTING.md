@@ -33,8 +33,8 @@ Ensure you have the following installed in your machine:
 In order to develop the Metrics API, its source code should be contained inside your `$GOPATH` and in the proper directory under `$GOPATH/src/`:
 
 ```bash
-git clone https://github.com/aerogear/aerogear-metrics-api.git $GOPATH/src/github.com/aerogear/aerogear-metrics-api
-cd aerogear-metrics-api/
+git clone https://github.com/aerogear/aerogear-app-metrics.git $GOPATH/src/github.com/aerogear/aerogear-app-metrics
+cd aerogear-app-metrics/
 ```
 
 See the [Go wiki](https://github.com/golang/go/wiki/GOPATH) for more information.

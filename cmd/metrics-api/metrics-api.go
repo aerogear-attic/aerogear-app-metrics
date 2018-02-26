@@ -4,10 +4,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aerogear/aerogear-metrics-api/pkg/config"
-	"github.com/aerogear/aerogear-metrics-api/pkg/dao"
-	"github.com/aerogear/aerogear-metrics-api/pkg/mobile"
-	"github.com/aerogear/aerogear-metrics-api/pkg/web"
+	"github.com/aerogear/aerogear-app-metrics/pkg/config"
+	"github.com/aerogear/aerogear-app-metrics/pkg/dao"
+	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+	"github.com/aerogear/aerogear-app-metrics/pkg/web"
 )
 
 func main() {
