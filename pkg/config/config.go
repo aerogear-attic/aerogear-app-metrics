@@ -16,7 +16,7 @@ func getEnv(key string, defaultVal string) string {
 func GetConfig() map[string]string {
 	return map[string]string{
 		"DBHost":        getEnv("PGHOST", "localhost"),
-		"DBUser":        getEnv("PGUSER", "postgres"),
+		"DBUser":        getEnv("PGUSER", "postgresql"),
 		"DBPassword":    getEnv("PGPASSWORD", "postgres"),
 		"DBName":        getEnv("PGDATABASE", "aerogear_mobile_metrics"),
 		"SSLMode":       getEnv("PGSSLMODE", "disable"),

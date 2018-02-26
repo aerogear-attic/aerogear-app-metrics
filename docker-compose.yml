@@ -7,7 +7,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRESQL_PASSWORD: postgres
-      POSTGRESQL_USER: postgres
+      POSTGRESQL_USER: postgresql
       POSTGRESQL_DATABASE: aerogear_mobile_metrics
   api:
     build:
@@ -16,7 +16,7 @@ services:
         BINARY: ./dist/linux_amd64/metrics
     environment:
       PGHOST: db
-      PGUSER: postgres
+      PGUSER: postgresql
       PGPASSWORD: postgres
       PGDATABASE: aerogear_mobile_metrics
     ports:
