@@ -7,13 +7,13 @@ jobs:
     docker:
       - image: circleci/golang:1.9
 
-      - image: postgres:9.5
+      - image: registry.access.redhat.com/rhscl/postgresql-96-rhel7:latest
         ports:
           - 5432:5432
         environment:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: aerogear_mobile_metrics
+          POSTGRESQL_PASSWORD: postgres
+          POSTGRESQL_USER: postgres
+          POSTGRESQL_DATABASE: aerogear_mobile_metrics
     #### TEMPLATE_NOTE: go expects specific checkout path representing url
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool

@@ -2,13 +2,13 @@ version: '3'
 
 services:
   db:
-    image: postgres:9.5-alpine
+    image: registry.access.redhat.com/rhscl/postgresql-96-rhel7:latest
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: aerogear_mobile_metrics
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_USER: postgres
+      POSTGRESQL_DATABASE: aerogear_mobile_metrics
   api:
     build:
       context: .
