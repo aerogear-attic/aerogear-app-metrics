@@ -71,16 +71,13 @@ The default configuration will allow the application to connect to the PostgreSQ
 
 ### Running a locally-built binary in a container
 
-In order to run a locally-built binary in a container utilize the `Dockerfile.debug` file:
+In order to run a locally-built binary in a container utilize the main `Dockerfile` via :
 
 ```
-docker build -t aerogear/aerogear-metrics-api -f Dockerfile.debug .
+make docker_build
 ```
 
-This will copy a `./metrics` binary from the root of the project (the default output location for `make build` command),
-and build an image from it.
-
-NOTE: If not on a Linux platform, make sure to build the binary with `make build_linux` to use [go cross-compilation](http://golangcookbook.com/chapters/running/cross-compiling/) to build a Linux-compatible binary.
+This will copy a binary from the default output location for `make build_linux` command, and build an image from it.
 
 ## Release
 
@@ -98,22 +95,16 @@ And make the release:
 make release
 ```
 
-### Building a container image for a released binary
+### Releasing a built container
 
-In order to build an image for a binary released with the previous process, utilize the `Dockerfile.prod` file:
+This repository also contains a set of commands to push the built container images to the `aerogear` docker hub organization.
 
-```
-docker build -t aerogear/aerogear-metrics-api -f Dockerfile.prod -build-arg version=0.0.x .
-```
-
-This will download the release's binary targetting the Linux OS to build the container image.
-
-To publish it to your user's docker registry account:
+These commands should preferrably run in a CD server, but are documented here for completeness and when required to be run locally
 
 ```
-# tag the image to your own namespace
-docker tag aerogear/aerogear-metrics-api {your_username}/aerogear-metrics-api
-docker login -u {your_username}
-# your password is prompted
-docker push {username}/aerogear-metrics-api
+# Add your dockerhub credentials to the environment variables
+DOCKERHUB_USERNAME={} DOCKERHUB_PASSWORD={} make docker_push_master
+
+# Manually add the tag information that would otherwise come from CI server metadata
+RELEASE_TAG=v0.0.1 make docker_push_release
 ```
