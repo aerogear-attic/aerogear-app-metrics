@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  db:
+    image: registry.access.redhat.com/rhscl/postgresql-96-rhel7:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_USER: postgresql
+      POSTGRESQL_DATABASE: aerogear_mobile_metrics
+  api:
+    build:
+      context: .
+      args:
+        BINARY: ./dist/linux_amd64/metrics
+    environment:
+      PGHOST: db
+      PGUSER: postgresql
+      PGPASSWORD: postgres
+      PGDATABASE: aerogear_mobile_metrics
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db

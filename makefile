@@ -4,7 +4,15 @@ PACKAGES     ?= $(shell sh -c "find $(TOP_SRC_DIRS) -name \\*_test.go \
                    -exec dirname {} \\; | sort | uniq")
 BIN_DIR := $(GOPATH)/bin
 SHELL = /bin/bash
-BINARY = metrics
+BINARY ?= metrics
+
+# This follows the output format for goreleaser
+BINARY_LINUX_64 = ./dist/linux_amd64/metrics
+
+DOCKER_LATEST_TAG = aerogear/aerogear-metrics-api:latest
+DOCKER_MASTER_TAG = aerogear/aerogear-metrics-api:master
+RELEASE_TAG ?= $(CIRCLE_TAG)
+DOCKER_RELEASE_TAG = aerogear/aerogear-metrics-api:$(RELEASE_TAG)
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
@@ -13,15 +21,24 @@ setup:
 	dep ensure
 
 .PHONY: build
-build: setup build_binary
-
-.PHONY: build_binary_linux
-build_binary_linux:
-	env GOOS=linux GOARCH=amd64 go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
-
-.PHONY: build_binary
-build_binary:
+build: setup
 	go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
+
+.PHONY: build_linux
+build_linux: setup
+	env GOOS=linux GOARCH=amd64 go build -o $(BINARY_LINUX_64) ./cmd/metrics-api/metrics-api.go
+
+.PHONY: docker_build
+docker_build: build_linux
+	docker build -t $(DOCKER_LATEST_TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
+
+.PHONY: docker_build_release
+docker_build_release:
+	docker build -t $(DOCKER_LATEST_TAG) -t $(DOCKER_RELEASE_TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
+
+.PHONY: docker_build_master
+docker_build_master:
+	docker build -t $(DOCKER_MASTER_TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
 
 .PHONY: test-unit
 test-unit:
@@ -65,4 +82,13 @@ clean:
 release: setup
 	goreleaser --rm-dist
 
-.PHONY: build
+.PHONY: docker_push_release
+docker_push_release:
+	docker login -u $(DOCKERHUB_USERNAME) -p $(DOCKERHUB_PASSWORD)
+	docker push $(DOCKER_LATEST_TAG)
+	docker push $(DOCKER_RELEASE_TAG)
+	
+.PHONY: docker_push_master
+docker_push_master:
+	docker login -u $(DOCKERHUB_USERNAME) -p $(DOCKERHUB_PASSWORD)
+	docker push $(DOCKER_MASTER_TAG)

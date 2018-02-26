@@ -9,7 +9,7 @@ import (
 func TestGetConfig(t *testing.T) {
 	expected := map[string]string{
 		"DBHost":        "localhost",
-		"DBUser":        "postgres",
+		"DBUser":        "postgresql",
 		"DBPassword":    "postgres",
 		"DBName":        "aerogear_mobile_metrics",
 		"SSLMode":       "disable",
@@ -50,7 +50,7 @@ func TestGetConfigCustomEnvVariables(t *testing.T) {
 func TestGetConfigEmptyEnvVariables(t *testing.T) {
 	expected := map[string]string{
 		"DBHost":        "localhost",
-		"DBUser":        "postgres",
+		"DBUser":        "postgresql",
 		"DBPassword":    "postgres",
 		"DBName":        "aerogear_mobile_metrics",
 		"SSLMode":       "disable",
