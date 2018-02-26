@@ -9,9 +9,10 @@ BINARY ?= metrics
 # This follows the output format for goreleaser
 BINARY_LINUX_64 = ./dist/linux_amd64/metrics
 
-DOCKER_LATEST_TAG = darahayes/aerogear-metrics-api:latest
+DOCKER_LATEST_TAG = aerogear/aerogear-metrics-api:latest
 DOCKER_MASTER_TAG = aerogear/aerogear-metrics-api:master
-DOCKER_RELEASE_TAG = darahayes/aerogear-metrics-api:$(CIRCLE_TAG)
+RELEASE_TAG ?= $(CIRCLE_TAG)
+DOCKER_RELEASE_TAG = aerogear/aerogear-metrics-api:$(RELEASE_TAG)
 
 LDFLAGS=-ldflags "-w -s -X main.Version=${TAG}"
 
