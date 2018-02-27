@@ -13,7 +13,7 @@ services:
     build:
       context: .
       args:
-        BINARY: ./dist/linux_amd64/metrics
+        BINARY: ./dist/linux_amd64/aerogear-app-metrics
     environment:
       PGHOST: db
       PGUSER: postgresql
