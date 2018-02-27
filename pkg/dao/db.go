@@ -3,7 +3,6 @@ package dao
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -13,16 +12,16 @@ type DatabaseHandler struct {
 	DB *sql.DB
 }
 
-func (handler *DatabaseHandler) Connect(dbHost, dbUser, dbPassword, dbName, sslMode string) error {
+func (handler *DatabaseHandler) Connect(connStr string, maxConnections int) error {
 	if handler.DB != nil {
 		return nil
 	}
 
-	connStr := fmt.Sprintf("host=%v user=%v password=%v dbname=%v sslmode=%v", dbHost, dbUser, dbPassword, dbName, sslMode)
-
 	// sql.Open doesn't initialize the connection immediately
 	dbInstance, err := sql.Open("postgres", connStr)
 	handler.DB = dbInstance
+
+	dbInstance.SetMaxOpenConns(maxConnections)
 
 	// an error can happen here if the connection string is invalid
 	if err != nil {
