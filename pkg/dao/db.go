@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -11,8 +12,6 @@ import (
 type DatabaseHandler struct {
 	DB *sql.DB
 }
-
-const mobileMetricsTable = "mobileappmetrics"
 
 func (handler *DatabaseHandler) Connect(dbHost, dbUser, dbPassword, dbName, sslMode string) error {
 	if handler.DB != nil {
@@ -23,19 +22,24 @@ func (handler *DatabaseHandler) Connect(dbHost, dbUser, dbPassword, dbName, sslM
 
 	// sql.Open doesn't initialize the connection immediately
 	dbInstance, err := sql.Open("postgres", connStr)
+	handler.DB = dbInstance
 
 	// an error can happen here if the connection string is invalid
 	if err != nil {
 		return err
 	}
 
-	// an error happens here if we cannot connect
-	if err = dbInstance.Ping(); err != nil {
-		return err
+	// basic connection retry logic
+	// mostly for issues where db server takes a few seconds to be ready
+	for retry := 1; retry <= 5; retry++ {
+		err = dbInstance.Ping()
+		if err == nil {
+			return nil
+		}
+		time.Sleep(1 * time.Second)
 	}
 
-	handler.DB = dbInstance
-	return nil
+	return err
 }
 
 func (handler *DatabaseHandler) Disconnect() error {
