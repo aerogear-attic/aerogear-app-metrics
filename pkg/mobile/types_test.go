@@ -1,7 +1,6 @@
 package mobile
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -49,11 +48,11 @@ func TestMetricValidate(t *testing.T) {
 		valid, reason := tc.Metric.Validate()
 
 		if valid != tc.Valid {
-			fmt.Errorf("case failed: %s. Expected: %v, got %v", tc.Name, tc.Valid, valid)
+			t.Errorf("case failed: %s. Expected: %v, got %v", tc.Name, tc.Valid, valid)
 		}
 
 		if reason != tc.ExpectedReason {
-			fmt.Errorf("case failed: %s. Expected: %v, got %v", tc.Name, tc.ExpectedReason, reason)
+			t.Errorf("case failed: %s. Expected: %v, got %v", tc.Name, tc.ExpectedReason, reason)
 		}
 	}
 }
