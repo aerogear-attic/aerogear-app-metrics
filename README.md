@@ -1,6 +1,6 @@
-# AeroGear App Metrics
+# Aerogear App Metrics
 
-This is the server component of the AeroGear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database. The service is written in [Golang](https://golang.org/).
+This is the server component of the Aerogear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database. The service is written in [Golang](https://golang.org/).
 
 ## Prerequisites
 
@@ -73,7 +73,7 @@ make build_linux
 This binary will be used to build the Docker image. Now start the entire application.
 
 ```
-docker-comose up
+docker-compose up
 ```
 
 ### Example Client Request
@@ -121,7 +121,7 @@ The `makefile` provided provides commands for building and testing the code. For
 
 * `make build` - Compiles a binary for your current system. The binary is output at `./aerogear-app-metrics`.
 
-* `make build_linux` - Compiles a Linux compatible binary. This is mainly used for Docker builds. **Note:** `make build` should still be used if you are a Linux user.
+* `make build_linux` - Compiles a Linux compatible binary. The binary is output at `./dist/linux_amd64/aerogear-app-metrics`. This is mainly used for Docker builds. `make build` can still be used if you are a Linux user.
 
 * `make docker_build` - Builds a Binary from source and uses that binary to create a Docker image.
 
