@@ -5,106 +5,143 @@ This is the server component of the AeroGear Metrics Service. It is a RESTful AP
 ## Prerequisites
 
 * [Install Golang](https://golang.org/doc/install)
+* [Ensure the $GOPATH environment variable is set](https://github.com/golang/go/wiki/SettingGOPATH)
 * [Install the dep package manager](https://golang.github.io/dep/docs/installation.html)
 * [Install Docker and Docker Compose](https://docs.docker.com/compose/install/)
 
 See the [Contributing Guide](./CONTRIBUTING.md) for more information.
 
 
-## Local development setup and building
+## Getting Started
 
-This section documents how to setup a local development environment, if you only wish to run the project with minimal setup, check the [Containerized building and running](#containerized-building-and-running) section.
+This section documents the ideal setup for local development. If you'd like to simply run the entire application in `docker-compose`, check out the relevant section.
 
-In Go, projects are typically kept in a [workspace](https://golang.org/doc/code.html#Workspaces) that follows a very specific architecture. Before cloning this repo, be sure you have a `GOPATH` env var that points to your workspace folder, say:
+Golang projects are kept in a [workspace](https://golang.org/doc/code.html#Workspaces) that follows a very specific architecture. Before cloning this repo, be sure you have a `$GOPATH` environment variable set up.
 
-```sh
-$ echo $GOPATH
-/Users/JohnDoe/workspaces/go
-```
-
-Then clone this repository by running:
+### Clone the Repsitory
 
 ```
 git clone git@github.com:aerogear/aerogear-app-metrics.git $GOPATH/src/github.com/aerogear/aerogear-app-metrics
 ```
 
-And finally install dependencies:
+### Install Dependencies
 ```
 make setup
 ```
 
-It is also possible to build the binaries by simply running:
-```
-make build
-```
+Note this is using the `dep` package manager under the hood. You will see the dependencies installed in the `vendor` folder.
 
-## Running the project
-
-### Containerized building and running
-
-You can use [Docker Compose](https://docs.docker.com/compose/) to run the project without requiring any extra setup other than a working docker installation.
+### Start the Database
 
 ```
-docker-compose up
+docker-compose up db
 ```
 
-This will run both the `db` and `api` services. If you wish to run only the database use `docker-compose up db`.
-
-The setup targets local development and testing, as such it utilizes the host's TCP ports 3000 for the API service and postgres' default port 5432.
-
-This means that these ports could be in use if you have another postgres instance running or other test web servers.
-
-### Running from source
-
-Utilize the `go run` command to transparently compile and run the project:
+### Start the Server
 
 ```
 go run cmd/metrics-api/metrics-api.go
+
+2018/02/27 10:51:54 Starting application... going to listen on :3000
 ```
 
-You can verify the server is running by GET-ing its health check endpoint:
-```
-curl http://localhost:3000/healthz
-```
+The application's default configuration will allow it to connect to the database created by `docker-compose`.
 
-The default configuration will allow the application to connect to the PostgreSQL container.
-
-### Running a locally-built binary in a container
-
-In order to run a locally-built binary in a container utilize the main `Dockerfile` via :
+You can test out the healthcheck endpoint:
 
 ```
-make docker_build
+curl -i http://localhost:3000/healthz
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Date: Tue, 27 Feb 2018 10:53:16 GMT
+Content-Length: 56
+
+{"time":"2018-02-27T10:53:16.313301415Z","status":"ok"}
 ```
 
-This will copy a binary from the default output location for `make build_linux` command, and build an image from it.
+### Run Entire Application with Docker Compose
 
-## Release
+This section shows how to start the entire application with `docker-compose`. This is useful for doing some quick tests (using the SDKs) for example.
 
-Build and publish to github releases using `goreleaser`, see `.goreleaser.yml` for configuration.
-
-First make sure you have this tool installed: [Intalling Goreleaser](https://goreleaser.com/#introduction.installing_goreleaser).
-
-Then tag your release, replacing `x` with the appropriate version:
-```
-git tag -a v0.0.x -m "Release 0.0.x"
-```
-
-And make the release:
-```
-make release
-```
-
-### Releasing a built container
-
-This repository also contains a set of commands to push the built container images to the `aerogear` docker hub organization.
-
-These commands should preferrably run in a CD server, but are documented here for completeness and when required to be run locally
+First, compile a Linux compatible binary:
 
 ```
-# Add your dockerhub credentials to the environment variables
-DOCKERHUB_USERNAME={} DOCKERHUB_PASSWORD={} make docker_push_master
-
-# Manually add the tag information that would otherwise come from CI server metadata
-RELEASE_TAG=v0.0.1 make docker_push_release
+make build_linux
 ```
+
+This binary will be used to build the Docker image. Now start the entire application.
+
+```
+docker-comose up
+```
+
+### Example Client Request
+
+This section shows an example `curl` request which can be used to send some data to the `/metrics` endpoint.
+
+```
+curl -i -X POST \
+  http://localhost:3000/metrics \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 87bf2b99-7cdc-8df9-9b2d-6cdcd2932159' \
+  -d '{
+  "clientId": "453de7432",
+  "data": {
+    "app": {
+      "id": "com.example.someApp",
+      "sdkVersion": "2.4.6",
+      "appVersion": "256"
+    },
+    "device": {
+      "platform": "android",
+      "platformVersion": "27"
+    }
+  }
+}'
+```
+
+You will see the returned back in the response. 
+
+If you have the `psql` command line tools you can connect to the Database and verify the data was inserted.
+
+```
+psql -U postgresql -d aerogear_mobile_metrics --host localhost
+Password for user postgresql: # postgres
+
+aerogear_mobile_metrics=> select * from mobileappmetrics;
+```
+
+## Builds and Testing
+
+The `makefile` provided provides commands for building and testing the code. For now, only the most important commands are documented.
+
+* `make setup` - Downloads the application dependencies.
+
+* `make build` - Compiles a binary for your current system. The binary is output at `./aerogear-app-metrics`.
+
+* `make build_linux` - Compiles a Linux compatible binary. This is mainly used for Docker builds. **Note:** `make build` should still be used if you are a Linux user.
+
+* `make docker_build` - Builds a Binary from source and uses that binary to create a Docker image.
+
+* `make test` - Runs the unit tests (alias for `make test-unit`).
+
+* `make test-integration` - Runs unit tests and integration tests. This requires a running database server.
+
+* `make test-integration-cover` - Same as `make test-integration` but also generates a code coverage report. Used in the CI service.
+
+
+## How to Release a New Version
+
+The release process for Aerogear maintainers is very simple. From the Github UI, simply create a release. **The release tag and title must be in the format `x.y.z`**. Formats such as `1.0` or `v1.0.0` are not valid.
+
+This will kick off an automated process in the CI service, where the following steps occur:
+
+* The release tag is checked out.
+* The code is built and the full test suite is run.
+* The [goreleaser](https://goreleaser.com/) tool generates a Changelog and binaries for Windows, MacOS and Linux. These are added to the release created in Github.
+* A new docker image is built and given the tags `latest` and `<git tag>` (where `<git tag>` is the `x.y.z` tag that was used).
+* The docker image is pushed to the Aerogear organization in Github.
+
+The automated release process takes 2-3 minutes to complete on average.
