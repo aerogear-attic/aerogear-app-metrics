@@ -2,7 +2,7 @@
 # Build customization
 builds:
   # makefile currently relies on this name
-  - binary: metrics
+  - binary: aerogear-app-metrics
     main: ./cmd/metrics-api/metrics-api.go
     goos:
       - windows

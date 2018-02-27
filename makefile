@@ -5,10 +5,10 @@ PACKAGES     ?= $(shell sh -c "find $(TOP_SRC_DIRS) -name \\*_test.go \
                    -exec dirname {} \\; | sort | uniq")
 BIN_DIR := $(GOPATH)/bin
 SHELL = /bin/bash
-BINARY ?= metrics
+BINARY ?= aerogear-app-metrics
 
 # This follows the output format for goreleaser
-BINARY_LINUX_64 = ./dist/linux_amd64/metrics
+BINARY_LINUX_64 = ./dist/linux_amd64/aerogear-app-metrics
 
 DOCKER_LATEST_TAG = aerogear/$(APP_NAME):latest
 DOCKER_MASTER_TAG = aerogear/$(APP_NAME):master
@@ -40,6 +40,9 @@ docker_build_release:
 .PHONY: docker_build_master
 docker_build_master:
 	docker build -t $(DOCKER_MASTER_TAG) --build-arg BINARY=$(BINARY_LINUX_64) .
+
+.PHONY: test
+test: test-unit
 
 .PHONY: test-unit
 test-unit:

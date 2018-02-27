@@ -1,5 +1,6 @@
 vendor/
 .idea/
-metrics
+aerogear-app-metrics
 dist/
 coverage*.out
+.DS_Store
