@@ -1,5 +1,9 @@
 package mobile
 
+import (
+	"fmt"
+)
+
 type AppConfig struct {
 	DBConnectionString string
 }
@@ -28,9 +32,17 @@ type DeviceMetric struct {
 	PlatformVersion string `json:"platformVersion"`
 }
 
+const clientIdMaxLength = 128
+
+var clientIdLengthError = fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength)
+
 func (m *Metric) Validate() (valid bool, reason string) {
 	if m.ClientId == "" {
 		return false, "missing clientId in payload"
+	}
+
+	if len(m.ClientId) > clientIdMaxLength {
+		return false, clientIdLengthError
 	}
 
 	// check if data field was missing or empty object

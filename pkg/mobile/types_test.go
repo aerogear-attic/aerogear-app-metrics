@@ -1,6 +1,8 @@
 package mobile
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -23,6 +25,12 @@ func TestMetricValidate(t *testing.T) {
 			Metric:         Metric{Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
 			Valid:          false,
 			ExpectedReason: "missing clientId in payload",
+		},
+		{
+			Name:           "Metric with long clientId should be invalid",
+			Metric:         Metric{ClientId: strings.Join(make([]string, clientIdMaxLength+10), "a"), Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Valid:          false,
+			ExpectedReason: fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength),
 		},
 		{
 			Name:           "Metric with no Data should be invalid",
