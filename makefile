@@ -91,5 +91,5 @@ docker_push_release:
 	
 .PHONY: docker_push_master
 docker_push_master:
-	docker login -u $(DOCKERHUB_USERNAME) -p $(DOCKERHUB_PASSWORD)
+	@docker login -u $(DOCKERHUB_USERNAME) -p $(DOCKERHUB_PASSWORD)
 	docker push $(DOCKER_MASTER_TAG)

@@ -24,6 +24,19 @@ jobs:
       - run: make test-integration-cover
       - run: /go/bin/goveralls -coverprofile=coverage-all.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
 
+  docker_push_master:
+    working_directory: /go/src/github.com/aerogear/aerogear-app-metrics
+    docker:
+      - image: circleci/golang:1.9
+    steps:
+      - checkout
+      - run: go get -u github.com/golang/dep/cmd/dep
+      - run: make setup
+      - setup_remote_docker
+      - run: make build_linux
+      - run: make docker_build_master
+      - run: make docker_push_master
+
   docker_release:
     working_directory: /go/src/github.com/aerogear/aerogear-app-metrics
     docker:
@@ -47,6 +60,13 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - docker_push_master:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
       - docker_release:
           requires:
             - build
