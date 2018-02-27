@@ -102,7 +102,7 @@ curl -i -X POST \
 }'
 ```
 
-You will see the returned back in the response. 
+You will see the data returned back in the response. 
 
 If you have the `psql` command line tools you can connect to the Database and verify the data was inserted.
 
