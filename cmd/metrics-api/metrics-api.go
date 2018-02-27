@@ -16,7 +16,7 @@ func main() {
 
 	dbHandler := dao.DatabaseHandler{}
 
-	err := dbHandler.Connect(config["DBHost"], config["DBUser"], config["DBPassword"], config["DBName"], config["SSLMode"])
+	err := dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
 
 	if err != nil {
 		panic("failed to connect to sql database : " + err.Error())
@@ -42,10 +42,10 @@ func main() {
 		web.HealthzRoute(router, healthHandler)
 	}
 
-	log.Printf("Starting application... going to listen on %v", config["ListenAddress"])
+	log.Printf("Starting application... going to listen on %v", config.ListenAddress)
 
 	//start
-	if err := http.ListenAndServe(config["ListenAddress"], router); err != nil {
+	if err := http.ListenAndServe(config.ListenAddress, router); err != nil {
 		panic("failed to start " + err.Error())
 	}
 }
