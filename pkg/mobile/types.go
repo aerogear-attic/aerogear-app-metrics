@@ -22,7 +22,7 @@ type MetricData struct {
 }
 
 type AppMetric struct {
-	ID         string `json:"id"`
+	ID         string `json:"appId"`
 	SDKVersion string `json:"sdkVersion"`
 	AppVersion string `json:"appVersion"`
 }
