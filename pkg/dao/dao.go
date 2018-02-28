@@ -2,6 +2,7 @@ package dao
 
 import (
 	"database/sql"
+	"time"
 )
 
 type MetricsDAO struct {
@@ -9,8 +10,8 @@ type MetricsDAO struct {
 }
 
 // Create a metrics record
-func (m *MetricsDAO) Create(clientId string, metricsData []byte) error {
-	_, err := m.db.Exec("INSERT INTO mobileappmetrics(clientId, data) VALUES($1, $2)", clientId, metricsData)
+func (m *MetricsDAO) Create(clientId string, metricsData []byte, clientTime *time.Time) error {
+	_, err := m.db.Exec("INSERT INTO mobileappmetrics(clientId, data, client_time) VALUES($1, $2, $3)", clientId, metricsData, clientTime)
 	return err
 }
 

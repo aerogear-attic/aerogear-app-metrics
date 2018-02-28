@@ -50,6 +50,18 @@ func TestMetricValidate(t *testing.T) {
 			Valid:          true,
 			ExpectedReason: "",
 		},
+		{
+			Name:           "Metric with bad timestamp should be invalid",
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "invalid", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Valid:          false,
+			ExpectedReason: "timestamp must be a valid number",
+		},
+		{
+			Name:           "Metric with valid timestamp should be valid",
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "12345", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Valid:          true,
+			ExpectedReason: "",
+		},
 	}
 
 	for _, tc := range testCases {

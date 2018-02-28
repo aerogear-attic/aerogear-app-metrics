@@ -42,7 +42,7 @@ func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := withJSON(w, 200, result); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		boom.BadImplementation(w)
 		return
 	}
 }

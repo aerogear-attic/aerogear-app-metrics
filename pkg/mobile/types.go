@@ -1,6 +1,7 @@
 package mobile
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -11,7 +12,7 @@ type AppConfig struct {
 // ClientMetric struct is what the client payload should be parsed into
 // Need to figure out how to structure this
 type Metric struct {
-	ClientTimestamp int64       `json:"timestamp,omitempty"`
+	ClientTimestamp json.Number `json:"timestamp,omitempty"`
 	ClientId        string      `json:"clientId"`
 	Data            *MetricData `json:"data,omitempty"`
 }
@@ -43,6 +44,12 @@ func (m *Metric) Validate() (valid bool, reason string) {
 
 	if len(m.ClientId) > clientIdMaxLength {
 		return false, clientIdLengthError
+	}
+
+	if m.ClientTimestamp != "" {
+		if _, err := m.ClientTimestamp.Int64(); err != nil {
+			return false, "timestamp must be a valid number"
+		}
 	}
 
 	// check if data field was missing or empty object
