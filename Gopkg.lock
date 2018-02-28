@@ -4,8 +4,8 @@
 [[projects]]
   name = "github.com/darahayes/go-boom"
   packages = ["."]
-  revision = "593134141157b11f33ed91c68cc279e9e3ae539c"
-  version = "1.1.1"
+  revision = "f55591080cdf94fb734b03174e9ceb9dae043533"
+  version = "1.1.2"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"

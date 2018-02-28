@@ -1,7 +1,7 @@
 # Aerogear App Metrics
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/aerogear/aerogear-app-metrics)](https://goreportcard.com/report/github.com/aerogear/aerogear-app-metrics)
-[![Coverage Status](https://coveralls.io/repos/github/aerogear/aerogear-metrics-api/badge.svg?branch=master)](https://coveralls.io/github/aerogear/aerogear-metrics-api?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/aerogear/aerogear-app-metrics/badge.svg?branch=master)](https://coveralls.io/github/aerogear/aerogear-app-metrics?branch=master)
 [![CircleCI](https://circleci.com/gh/aerogear/aerogear-app-metrics.svg?style=svg)](https://circleci.com/gh/aerogear/aerogear-app-metrics)
 
 This is the server component of the AeroGear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database. The service is written in [Golang](https://golang.org/).
