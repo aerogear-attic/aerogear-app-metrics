@@ -19,6 +19,8 @@ func TestConfig(t *testing.T) {
 				ListenAddress:      ":3000",
 				DBMaxConnections:   100,
 				DBConnectionString: "connect_timeout=5 dbname=aerogear_mobile_metrics host=localhost password=postgres port=5432 sslmode=disable user=postgresql",
+				LogFormat:          "text",
+				LogLevel:           "info",
 			},
 			EnvVars: map[string]string{},
 		},
@@ -28,6 +30,8 @@ func TestConfig(t *testing.T) {
 				ListenAddress:      ":3000",
 				DBMaxConnections:   100,
 				DBConnectionString: "connect_timeout=5 dbname=testing host=testing password=testing port=5432 sslmode=testing user=testing",
+				LogFormat:          "testing",
+				LogLevel:           "testing",
 			},
 			EnvVars: map[string]string{
 				"PGHOST":     "testing",
@@ -35,6 +39,8 @@ func TestConfig(t *testing.T) {
 				"PGPASSWORD": "testing",
 				"PGDATABASE": "testing",
 				"PGSSLMODE":  "testing",
+				"LOG_LEVEL":  "testing",
+				"LOG_FORMAT": "testing",
 			},
 		},
 		{
@@ -43,6 +49,8 @@ func TestConfig(t *testing.T) {
 				ListenAddress:      ":3000",
 				DBMaxConnections:   100,
 				DBConnectionString: "connect_timeout=5 dbname=aerogear_mobile_metrics host=localhost password=postgres port=5432 sslmode=disable user=postgresql",
+				LogFormat:          "text",
+				LogLevel:           "info",
 			},
 			EnvVars: map[string]string{
 				"PGHOST":     "",
@@ -51,6 +59,8 @@ func TestConfig(t *testing.T) {
 				"PGDATABASE": "",
 				"PGSSLMODE":  "",
 				"PORT":       "",
+				"LOG_LEVEL":  "",
+				"LOG_FORMAT": "",
 			},
 		},
 		{
@@ -59,6 +69,8 @@ func TestConfig(t *testing.T) {
 				ListenAddress:      ":4000",
 				DBMaxConnections:   5,
 				DBConnectionString: "connect_timeout=5 dbname=aerogear_mobile_metrics host=localhost password=postgres port=5432 sslmode=disable user=postgresql",
+				LogFormat:          "text",
+				LogLevel:           "info",
 			},
 			EnvVars: map[string]string{
 				"DBMAX_CONNECTIONS": "5",
@@ -71,6 +83,8 @@ func TestConfig(t *testing.T) {
 				ListenAddress:      ":3000",
 				DBMaxConnections:   100,
 				DBConnectionString: "connect_timeout=5 dbname=aerogear_mobile_metrics host=localhost password=postgres port=5432 sslmode=disable user=postgresql",
+				LogFormat:          "text",
+				LogLevel:           "info",
 			},
 			EnvVars: map[string]string{
 				"DBMAX_CONNECTIONS": "not an integer",

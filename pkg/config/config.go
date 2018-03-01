@@ -12,6 +12,8 @@ type config struct {
 	DBConnectionString string
 	DBMaxConnections   int
 	ListenAddress      string
+	LogLevel           string
+	LogFormat          string
 }
 
 func GetConfig() config {
@@ -19,6 +21,8 @@ func GetConfig() config {
 		DBConnectionString: getDBConnectionString(),
 		DBMaxConnections:   getEnvInt("DBMAX_CONNECTIONS", 100),
 		ListenAddress:      fmt.Sprintf(":%v", getEnvInt("PORT", 3000)),
+		LogLevel:           strings.ToLower(getEnv("LOG_LEVEL", "info")),
+		LogFormat:          strings.ToLower(getEnv("LOG_FORMAT", "text")),
 	}
 }
 
