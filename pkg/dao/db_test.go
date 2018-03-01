@@ -1,5 +1,4 @@
 // +build integration
-
 package dao
 
 import (
@@ -12,7 +11,7 @@ func TestConnect(t *testing.T) {
 	config := config.GetConfig()
 	dbHandler := DatabaseHandler{}
 
-	err := dbHandler.Connect(config["DBHost"], config["DBUser"], config["DBPassword"], config["DBName"], config["SSLMode"])
+	err := dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
 
 	if err != nil {
 		t.Errorf("Connect() returned an error: %s", err.Error())
@@ -29,13 +28,13 @@ func TestConnectAlreadyConnected(t *testing.T) {
 	config := config.GetConfig()
 	dbHandler := DatabaseHandler{}
 
-	err := dbHandler.Connect(config["DBHost"], config["DBUser"], config["DBPassword"], config["DBName"], config["SSLMode"])
+	err := dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
 
 	if err != nil {
 		t.Errorf("Connect() returned an error: %s", err.Error())
 	}
 
-	err = dbHandler.Connect(config["DBHost"], config["DBUser"], config["DBPassword"], config["DBName"], config["SSLMode"])
+	err = dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
 
 	if err != nil {
 		t.Errorf("Connect() returned an error: %s", err.Error())
@@ -46,7 +45,7 @@ func TestDisconnect(t *testing.T) {
 	config := config.GetConfig()
 	dbHandler := DatabaseHandler{}
 
-	err := dbHandler.Connect(config["DBHost"], config["DBUser"], config["DBPassword"], config["DBName"], config["SSLMode"])
+	err := dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
 
 	if err != nil {
 		t.Errorf("Connect() returned an error: %s", err.Error())
@@ -79,7 +78,7 @@ func TestDoInitialSetup(t *testing.T) {
 	config := config.GetConfig()
 	dbHandler := DatabaseHandler{}
 
-	err := dbHandler.Connect(config["DBHost"], config["DBUser"], config["DBPassword"], config["DBName"], config["SSLMode"])
+	err := dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
 
 	if err != nil {
 		t.Errorf("Connect() returned an error: %s", err.Error())
