@@ -22,7 +22,7 @@ func GetConfig() config {
 		DBMaxConnections:   getEnvInt("DBMAX_CONNECTIONS", 100),
 		ListenAddress:      fmt.Sprintf(":%v", getEnvInt("PORT", 3000)),
 		LogLevel:           strings.ToLower(getEnv("LOG_LEVEL", "info")),
-		LogFormat:          strings.ToLower(getEnv("LOG_FORMAT", "text")),
+		LogFormat:          strings.ToLower(getEnv("LOG_FORMAT", "text")), //can be text or json
 	}
 }
 
