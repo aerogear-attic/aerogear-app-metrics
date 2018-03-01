@@ -1,9 +1,10 @@
 package web
 
 import (
-	"log"
 	"net/http"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func loggerMiddleWare(next http.Handler) http.Handler {
@@ -12,12 +13,12 @@ func loggerMiddleWare(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 
-		log.Printf(
-			"%s\t%s\t%s",
-			r.Method,
-			r.RequestURI,
-			time.Since(start),
-		)
+		log.WithFields(log.Fields{
+			"method":        r.Method,
+			"path":          r.RequestURI,
+			"client_ip":     r.RemoteAddr,
+			"response_time": time.Since(start),
+		}).Info()
 	})
 }
 
