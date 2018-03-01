@@ -22,7 +22,7 @@ func (m MetricsService) Create(metric Metric) (Metric, error) {
 
 	t, err := metric.ClientTimestamp.Int64()
 
-	// happens timestamp is empty
+	// happens if timestamp is empty
 	if err != nil {
 		return metric, m.mdao.Create(metric.ClientId, metricsData, nil)
 	}
