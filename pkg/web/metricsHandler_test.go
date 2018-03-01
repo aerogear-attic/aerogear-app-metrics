@@ -33,7 +33,7 @@ func setupMetricsHandler(service MetricsServiceInterface) *httptest.Server {
 
 func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 	metric := mobile.Metric{
-		ClientTimestamp: 1234,
+		ClientTimestamp: "1234",
 		ClientId:        "client123",
 		Data: &mobile.MetricData{
 			App: &mobile.AppMetric{
@@ -71,7 +71,7 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 
 func TestMetricsEndpointShouldReturn500WhenThereIsAnErrorInMetricsService(t *testing.T) {
 	metric := mobile.Metric{
-		ClientTimestamp: 1234,
+		ClientTimestamp: "1234",
 		ClientId:        "client123",
 		Data: &mobile.MetricData{
 			App: &mobile.AppMetric{
