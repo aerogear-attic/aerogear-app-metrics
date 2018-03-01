@@ -56,6 +56,7 @@ func initLogger(level, format string) {
 	logLevel, err := log.ParseLevel(level)
 
 	if err != nil {
+		log.Fatalf("log level %v is not allowed. Must be one of [debug, info, warning, error, fatal, panic]", level)
 		logLevel = log.InfoLevel
 	}
 
@@ -64,7 +65,9 @@ func initLogger(level, format string) {
 	switch format {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
-	default:
+	case "text":
 		log.SetFormatter(&log.TextFormatter{DisableColors: true})
+	default:
+		log.Fatalf("log format %v is not allowed. Must be one of [text, json]", format)
 	}
 }
