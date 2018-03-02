@@ -34,16 +34,11 @@ type DeviceMetric struct {
 	PlatformVersion string `json:"platformVersion"`
 }
 
-type SecurityMetrics struct {
-	EmulatorCheck      *SecurityMetric `json:"org.aerogear.mobile.security.checks.EmulatorCheck,omitempty,string"`
-	DeveloperModeCheck *SecurityMetric `json:"org.aerogear.mobile.security.checks.DeveloperModeCheck,omitempty,string"`
-	DebuggerCheck      *SecurityMetric `json:"org.aerogear.mobile.security.checks.DebuggerCheck,omitempty,string"`
-	RootedCheck        *SecurityMetric `json:"org.aerogear.mobile.security.checks.RootedCheck,omitempty,string"`
-	ScreenLockCheck    *SecurityMetric `json:"org.aerogear.mobile.security.checks.ScreenLockCheck,omitempty,string"`
-}
+type SecurityMetrics []SecurityMetric
 
 type SecurityMetric struct {
-	Passed bool `json:"passed"`
+	Type   string `json:"type"`
+	Passed bool   `json:"passed"`
 }
 
 const clientIdMaxLength = 128
