@@ -47,11 +47,12 @@ const securityMetricsMaxLength = 30
 const clientIdMissingError = "missing clientId in payload"
 const invalidTimestampError = "timestamp must be a valid number"
 const missingDataError = "missing metrics data in payload"
-const clientIdLengthError = "clientId exceeded maximum length of " + string(clientIdMaxLength)
-const securityMetricsLengthError = "maximum length of data.security is " + string(securityMetricsMaxLength)
 const securityMetricsEmptyError = "data.security cannot be empty"
 const securityMetricMissingTypeError = "invalid element in data.security at position %v, type must be included"
 const securityMetricMissingPassedError = "invalid element in data.security at position %v, passed must be included"
+
+var clientIdLengthError = fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength)
+var securityMetricsLengthError = fmt.Sprintf("maximum length of data.security %v", securityMetricsMaxLength)
 
 func (m *Metric) Validate() (valid bool, reason string) {
 	if m.ClientId == "" {
