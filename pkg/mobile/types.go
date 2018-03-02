@@ -44,7 +44,7 @@ type SecurityMetric struct {
 const clientIdMaxLength = 128
 const securityMetricsMaxLength = 30
 
-const clientIdMissingError = "missing clientId in payload"
+const missingClientIdError = "missing clientId in payload"
 const invalidTimestampError = "timestamp must be a valid number"
 const missingDataError = "missing metrics data in payload"
 const securityMetricsEmptyError = "data.security cannot be empty"
@@ -56,7 +56,7 @@ var securityMetricsLengthError = fmt.Sprintf("maximum length of data.security %v
 
 func (m *Metric) Validate() (valid bool, reason string) {
 	if m.ClientId == "" {
-		return false, clientIdMissingError
+		return false, missingClientIdError
 	}
 
 	if len(m.ClientId) > clientIdMaxLength {

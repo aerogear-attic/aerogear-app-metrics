@@ -8,6 +8,14 @@ import (
 
 func TestMetricValidate(t *testing.T) {
 
+	securityMetricType := "org.aerogear.mobile.security.checks.TestCheck"
+	securityMetricPassed := true
+
+	bigSecurityMetricList := SecurityMetrics{}
+	for i := 0; i <= clientIdMaxLength+1; i++ {
+		bigSecurityMetricList = append(bigSecurityMetricList, SecurityMetric{Type: &securityMetricType, Passed: &securityMetricPassed})
+	}
+
 	testCases := []struct {
 		Name           string
 		Metric         Metric
@@ -18,31 +26,31 @@ func TestMetricValidate(t *testing.T) {
 			Name:           "Empty metric should be invalid",
 			Metric:         Metric{},
 			Valid:          false,
-			ExpectedReason: "missing clientId in payload",
+			ExpectedReason: missingClientIdError,
 		},
 		{
 			Name:           "Metric with no clientId should be invalid",
 			Metric:         Metric{Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
 			Valid:          false,
-			ExpectedReason: "missing clientId in payload",
+			ExpectedReason: missingClientIdError,
 		},
 		{
 			Name:           "Metric with long clientId should be invalid",
 			Metric:         Metric{ClientId: strings.Join(make([]string, clientIdMaxLength+10), "a"), Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
 			Valid:          false,
-			ExpectedReason: fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength),
+			ExpectedReason: clientIdLengthError,
 		},
 		{
 			Name:           "Metric with no Data should be invalid",
 			Metric:         Metric{ClientId: "org.aerogear.metrics.testing"},
 			Valid:          false,
-			ExpectedReason: "missing metrics data in payload",
+			ExpectedReason: missingDataError,
 		},
 		{
 			Name:           "Metric with empty Data should be invalid",
 			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{}},
 			Valid:          false,
-			ExpectedReason: "missing metrics data in payload",
+			ExpectedReason: missingDataError,
 		},
 		{
 			Name:           "Metric with ClientId and Some Data should be valid",
@@ -54,13 +62,37 @@ func TestMetricValidate(t *testing.T) {
 			Name:           "Metric with bad timestamp should be invalid",
 			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "invalid", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
 			Valid:          false,
-			ExpectedReason: "timestamp must be a valid number",
+			ExpectedReason: invalidTimestampError,
 		},
 		{
 			Name:           "Metric with valid timestamp should be valid",
 			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "12345", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
 			Valid:          true,
 			ExpectedReason: "",
+		},
+		{
+			Name:           "Security Metrics with missing type field should be invalid",
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Type: nil, Passed: &securityMetricPassed}}}},
+			Valid:          false,
+			ExpectedReason: fmt.Sprintf(securityMetricMissingTypeError, 0),
+		},
+		{
+			Name:           "Security Metrics with missing passed field should be invalid",
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Type: &securityMetricType, Passed: nil}}}},
+			Valid:          false,
+			ExpectedReason: fmt.Sprintf(securityMetricMissingPassedError, 0),
+		},
+		{
+			Name:           "Empty Security Metrics slice should be invalid",
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{}}},
+			Valid:          false,
+			ExpectedReason: securityMetricsEmptyError,
+		},
+		{
+			Name:           "Security Metrics slice with length > max length should be valid",
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &bigSecurityMetricList}},
+			Valid:          false,
+			ExpectedReason: securityMetricsLengthError,
 		},
 	}
 
