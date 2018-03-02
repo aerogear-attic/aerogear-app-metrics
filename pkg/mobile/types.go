@@ -18,8 +18,9 @@ type Metric struct {
 }
 
 type MetricData struct {
-	App    *AppMetric    `json:"app,omitempty"`
-	Device *DeviceMetric `json:"device,omitempty"`
+	App      *AppMetric       `json:"app,omitempty"`
+	Device   *DeviceMetric    `json:"device,omitempty"`
+	Security *SecurityMetrics `json:"security,omitempty"`
 }
 
 type AppMetric struct {
@@ -31,6 +32,18 @@ type AppMetric struct {
 type DeviceMetric struct {
 	Platform        string `json:"platform"`
 	PlatformVersion string `json:"platformVersion"`
+}
+
+type SecurityMetrics struct {
+	EmulatorCheck      *SecurityMetric `json:"org.aerogear.mobile.security.checks.EmulatorCheck,omitempty,string"`
+	DeveloperModeCheck *SecurityMetric `json:"org.aerogear.mobile.security.checks.DeveloperModeCheck,omitempty,string"`
+	DebuggerCheck      *SecurityMetric `json:"org.aerogear.mobile.security.checks.DebuggerCheck,omitempty,string"`
+	RootedCheck        *SecurityMetric `json:"org.aerogear.mobile.security.checks.RootedCheck,omitempty,string"`
+	ScreenLockCheck    *SecurityMetric `json:"org.aerogear.mobile.security.checks.ScreenLockCheck,omitempty,string"`
+}
+
+type SecurityMetric struct {
+	Passed bool `json:"passed"`
 }
 
 const clientIdMaxLength = 128
