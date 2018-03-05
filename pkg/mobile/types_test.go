@@ -9,6 +9,7 @@ import (
 func TestMetricValidate(t *testing.T) {
 
 	securityMetricType := "org.aerogear.mobile.security.checks.TestCheck"
+	securityMetricName := "TestCheck"
 	securityMetricPassed := true
 
 	bigSecurityMetricList := SecurityMetrics{}
@@ -72,13 +73,19 @@ func TestMetricValidate(t *testing.T) {
 		},
 		{
 			Name:           "Security Metrics with missing type field should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Type: nil, Passed: &securityMetricPassed}}}},
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Type: nil, Name: &securityMetricName, Passed: &securityMetricPassed}}}},
 			Valid:          false,
 			ExpectedReason: fmt.Sprintf(securityMetricMissingTypeError, 0),
 		},
 		{
+			Name:           "Security Metrics with missing name field should be invalid",
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Type: &securityMetricType, Name: nil, Passed: &securityMetricPassed}}}},
+			Valid:          false,
+			ExpectedReason: fmt.Sprintf(securityMetricMissingNameError, 0),
+		},
+		{
 			Name:           "Security Metrics with missing passed field should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Type: &securityMetricType, Passed: nil}}}},
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Type: &securityMetricType, Name: &securityMetricName, Passed: nil}}}},
 			Valid:          false,
 			ExpectedReason: fmt.Sprintf(securityMetricMissingPassedError, 0),
 		},

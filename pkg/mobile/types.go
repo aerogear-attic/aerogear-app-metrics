@@ -38,6 +38,7 @@ type SecurityMetrics []SecurityMetric
 
 type SecurityMetric struct {
 	Type   *string `json:"type,omitempty"`
+	Name   *string `json:"name,omitempty"`
 	Passed *bool   `json:"passed,omitempty"`
 }
 
@@ -49,6 +50,7 @@ const invalidTimestampError = "timestamp must be a valid number"
 const missingDataError = "missing metrics data in payload"
 const securityMetricsEmptyError = "data.security cannot be empty"
 const securityMetricMissingTypeError = "invalid element in data.security at position %v, type must be included"
+const securityMetricMissingNameError = "invalid element in data.security at position %v, type must be included"
 const securityMetricMissingPassedError = "invalid element in data.security at position %v, passed must be included"
 
 var clientIdLengthError = fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength)
@@ -84,6 +86,9 @@ func (m *Metric) Validate() (valid bool, reason string) {
 		for i, sm := range *m.Data.Security {
 			if sm.Type == nil {
 				return false, fmt.Sprintf(securityMetricMissingTypeError, i)
+			}
+			if sm.Name == nil {
+				return false, fmt.Sprintf(securityMetricMissingNameError, i)
 			}
 			if sm.Passed == nil {
 				return false, fmt.Sprintf(securityMetricMissingPassedError, i)
