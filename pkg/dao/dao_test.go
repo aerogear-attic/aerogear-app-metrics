@@ -46,14 +46,10 @@ func TestIsHealthyWhenDisconnected(t *testing.T) {
 
 	dbHandler.Disconnect()
 
-	isHealthy, err := dao.IsHealthy()
+	err = dao.IsHealthy()
 
 	if err == nil {
 		t.Errorf("isHealthy returned no error when disconnected")
-	}
-
-	if isHealthy {
-		t.Errorf("isHealthy returned true when disconnected")
 	}
 }
 
