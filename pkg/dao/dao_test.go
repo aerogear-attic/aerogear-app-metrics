@@ -25,14 +25,10 @@ func TestIsHealthy(t *testing.T) {
 
 	dao := NewMetricsDAO(dbHandler.DB)
 
-	isHealthy, err := dao.IsHealthy()
+	err = dao.IsHealthy()
 
 	if err != nil {
 		t.Errorf("isHealthy returned an error %s", err.Error())
-	}
-
-	if !isHealthy {
-		t.Errorf("isHealthy returned false")
 	}
 }
 
