@@ -4,10 +4,6 @@ import (
 	"errors"
 	"testing"
 
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -18,57 +14,28 @@ type MockHealthCheckable struct {
 }
 
 // IsHealthy provides a mock function with given fields:
-func (_m *MockHealthCheckable) IsHealthy() (bool, error) {
-	ret := _m.Called()
-
-	var r0 bool
-	if rf, ok := ret.Get(0).(func() bool); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+func (_m *MockHealthCheckable) IsHealthy() error {
+	args := _m.Called()
+	return args.Error(0)
 }
 
-func TestHealthz(t *testing.T) {
+func TestPing(t *testing.T) {
 	checkable := &MockHealthCheckable{}
-
 	healthHandler := NewHealthHandler(checkable)
 
-	assert.HTTPSuccess(t, healthHandler.Healthz, "GET", "/healthz", nil, nil)
-	checkable.AssertExpectations(t)
+	assert.HTTPSuccess(t, healthHandler.Ping, "GET", "/ping", nil, nil)
 }
 
 func TestHealthzPing(t *testing.T) {
 	checkable := &MockHealthCheckable{}
 
-	checkable.On("IsHealthy").Return(true, nil).Times(1)
-	checkable.On("IsHealthy").Return(false, errors.New("db offline")).Times(1)
-
 	healthHandler := NewHealthHandler(checkable)
 
-	assert.HTTPSuccess(t, healthHandler.Ping, "GET", "/healthz/ping", nil, nil)
-	assert.HTTPError(t, healthHandler.Ping, "GET", "/healthz/ping", nil, nil)
+	checkable.On("IsHealthy").Return(nil).Once()
+	assert.HTTPSuccess(t, healthHandler.Healthz, "GET", "/healthz", nil, nil)
+
+	checkable.On("IsHealthy").Return(errors.New("db offline")).Once()
+	assert.HTTPError(t, healthHandler.Healthz, "GET", "/healthz", nil, nil)
 
 	checkable.AssertExpectations(t)
-}
-
-func expectOkayHealthResponse(handler http.HandlerFunc, url string, t *testing.T) {
-	request := httptest.NewRequest("GET", url, nil)
-	w := httptest.NewRecorder()
-	handler(w, request)
-
-	res := w.Result()
-	_, err := ioutil.ReadAll(res.Body)
-	assert.Nil(t, err)
-
-	assert.Equal(t, 200, res.StatusCode)
 }
