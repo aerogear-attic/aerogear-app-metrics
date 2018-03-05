@@ -4,7 +4,6 @@ import (
 	"errors"
 	"testing"
 
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -68,13 +67,8 @@ func expectOkayHealthResponse(handler http.HandlerFunc, url string, t *testing.T
 	handler(w, request)
 
 	res := w.Result()
-	body, err := ioutil.ReadAll(res.Body)
+	_, err := ioutil.ReadAll(res.Body)
 	assert.Nil(t, err)
-
-	response := &healthResponse{}
-	if err := json.Unmarshal(body, response); err != nil {
-		t.Fatal("failed to unmarshal response body", err)
-	}
 
 	assert.Equal(t, 200, res.StatusCode)
 }
