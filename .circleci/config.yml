@@ -7,7 +7,7 @@ jobs:
     working_directory: /go/src/github.com/aerogear/aerogear-app-metrics
 
     docker:
-      - image: circleci/golang:1.9
+      - image: circleci/golang:1.10
       - image: registry.access.redhat.com/rhscl/postgresql-96-rhel7:latest
         ports:
           - 5432:5432
