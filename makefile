@@ -47,20 +47,20 @@ test: test-unit
 .PHONY: test-unit
 test-unit:
 	@echo Running tests:
-	go test -v -race -cover $(UNIT_TEST_FLAGS) \
+	GOCACHE=off go test -cover \
 	  $(addprefix $(PKG)/,$(PACKAGES))
 
 .PHONY: test-integration
 test-integration:
 	@echo Running tests:
-	go test -v -race -cover $(UNIT_TEST_FLAGS) -tags=integration \
+	GOCACHE=off go test -failfast -cover -tags=integration \
 	  $(addprefix $(PKG)/,$(PACKAGES))
 
 .PHONY: test-integration-cover
 test-integration-cover:
 	echo "mode: count" > coverage-all.out
-	$(foreach pkg,$(PACKAGES),\
-		go test -tags=integration -coverprofile=coverage.out -covermode=count $(addprefix $(PKG)/,$(pkg)) || exit 1;\
+	GOCACHE=off $(foreach pkg,$(PACKAGES),\
+		go test -failfast -tags=integration -coverprofile=coverage.out -covermode=count $(addprefix $(PKG)/,$(pkg)) || exit 1;\
 		tail -n +2 coverage.out >> coverage-all.out;)
 
 .PHONY: errcheck
