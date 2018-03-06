@@ -4,3 +4,5 @@ aerogear-app-metrics
 dist/
 coverage*.out
 .DS_Store
+cmd/metrics-api/debug
+.vscode
