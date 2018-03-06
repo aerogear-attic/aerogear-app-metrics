@@ -94,7 +94,7 @@ curl -i -X POST \
   "clientId": "453de7432",
   "data": {
     "app": {
-      "id": "com.example.someApp",
+      "appId": "com.example.someApp",
       "sdkVersion": "2.4.6",
       "appVersion": "256"
     },
@@ -134,6 +134,37 @@ The `makefile` provided provides commands for building and testing the code. For
 * `make test-integration` - Runs unit tests and integration tests. This requires a running database server.
 
 * `make test-integration-cover` - Same as `make test-integration` but also generates a code coverage report. Used in the CI service.
+
+## Environment Variables
+
+The aerogear-app-metrics server is configured using environment variables:
+
+### Server Configuration
+
+| Variable          | Default | Description                                                                |
+|-------------------|---------|----------------------------------------------------------------------------|
+| PORT              | 3000    | The port the server will listen on                                         |
+| LOG_LEVEL         | info    | Can be one of [debug, info, warning, error, fatal, panic]                  |
+| LOG_FORMAT        | text    | Can be one of [text, json]                                                 |
+| DBMAX_CONNECTIONS | 100     | The maximum number of concurrent database connections the server will open |
+
+### Database Connection Parameters
+
+The database connection is configured using the table of environment variables below. These environment variables correspond to the PostgreSQL [libpq environment variables](https://www.postgresql.org/docs/current/static/libpq-envars.html). The table below shows all of the environment variables supported by the `pq` driver used in this server.
+
+| Variable          | Default                 | Description                                                                                                                                   |
+|-------------------|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| PGDATABASE        | aerogear_mobile_metrics | The database to connect to                                                                                                                    |
+| PGUSER            | postgresql              | The database user                                                                                                                             |
+| PGPASSWORD        | postgres                | The database password                                                                                                                         |
+| PGHOST            | localhost               | The database hostname to connect to                                                                                                           |
+| PGPORT            | 5432                    | The database port to connect to                                                                                                               |
+| PGSSLMODE         | disable                 | The SSL mode                                                                                                                                  |
+| PGCONNECT_TIMEOUT | 5                       | The default connection timeout (seconds)                                                                                                      |
+| PGAPPNAME         |                         | The [application_name](https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNECT-APPLICATION-NAME) connection parameter |
+| PGSSLCERT         |                         | The [sslcert](https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNECT-SSLCERT) connection parameter.                  |
+| PGSSLKEY          |                         | The [sslkey](https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNECT-SSLKEY) connection parameter.                    |
+| PGSSLROOTCERT     |                         | The [sslrootcert](https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNECT-SSLROOTCERT) connection parameter           |
 
 
 ## How to Release a New Version
