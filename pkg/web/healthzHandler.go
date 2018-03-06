@@ -2,17 +2,9 @@ package web
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/darahayes/go-boom"
 )
-
-// not reusable type so make it package local
-
-type healthResponse struct {
-	Timestamp time.Time `json:"time"`
-	Status    string    `json:"status"`
-}
 
 type healthHandler struct {
 	healthCheckTarget HealthCheckable
@@ -27,36 +19,20 @@ func NewHealthHandler(healthCheckTarget HealthCheckable) *healthHandler {
 	}
 }
 
-// Healthz is the implementation for a liveness endpoint.
+// Ping is the implementation for a liveness endpoint.
 // It signals the process is up and running but doesn't guarantee connectivity
-func (hh *healthHandler) Healthz(w http.ResponseWriter, r *http.Request) {
-	status := healthResponse{
-		Timestamp: time.Now().UTC(),
-		Status:    "ok",
-	}
-
-	if err := withJSON(w, 200, status); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func (hh *healthHandler) Ping(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
 }
 
-// Ping is the implementation for a readiness endpoint.
+// Healthz is the implementation for a readiness endpoint.
 // It signals this process is ready to accept connections
 // and respond to API requests
-func (hh *healthHandler) Ping(w http.ResponseWriter, r *http.Request) {
-	healthy, _ := hh.healthCheckTarget.IsHealthy()
-	if !healthy {
+func (hh *healthHandler) Healthz(w http.ResponseWriter, r *http.Request) {
+	if err := hh.healthCheckTarget.IsHealthy(); err != nil {
 		boom.ServerUnavailable(w)
 		return
 	}
 
-	status := healthResponse{
-		Timestamp: time.Now().UTC(),
-		Status:    "ok",
-	}
-	if err := withJSON(w, 200, status); err != nil {
-		boom.Internal(w)
-		return
-	}
+	w.WriteHeader(200)
 }

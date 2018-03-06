@@ -1,4 +1,5 @@
 // +build integration
+
 package dao
 
 import (
@@ -25,14 +26,10 @@ func TestIsHealthy(t *testing.T) {
 
 	dao := NewMetricsDAO(dbHandler.DB)
 
-	isHealthy, err := dao.IsHealthy()
+	err = dao.IsHealthy()
 
 	if err != nil {
 		t.Errorf("isHealthy returned an error %s", err.Error())
-	}
-
-	if !isHealthy {
-		t.Errorf("isHealthy returned false")
 	}
 }
 
@@ -50,14 +47,10 @@ func TestIsHealthyWhenDisconnected(t *testing.T) {
 
 	dbHandler.Disconnect()
 
-	isHealthy, err := dao.IsHealthy()
+	err = dao.IsHealthy()
 
 	if err == nil {
 		t.Errorf("isHealthy returned no error when disconnected")
-	}
-
-	if isHealthy {
-		t.Errorf("isHealthy returned true when disconnected")
 	}
 }
 

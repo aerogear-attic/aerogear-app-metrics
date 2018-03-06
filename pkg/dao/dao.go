@@ -17,9 +17,10 @@ func (m *MetricsDAO) Create(clientId string, metricsData []byte, clientTime *tim
 
 // IsHealthy checks that we are connected to the database
 // This will be used by the healthcheck
-func (m *MetricsDAO) IsHealthy() (bool, error) {
-	err := m.db.Ping()
-	return err == nil, err
+func (m *MetricsDAO) IsHealthy() error {
+	// bug in m.db.Ping() doesn't return error if db goes down
+	_, err := m.db.Exec("SELECT 1;")
+	return err
 }
 
 func NewMetricsDAO(db *sql.DB) *MetricsDAO {

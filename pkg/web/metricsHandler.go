@@ -36,7 +36,7 @@ func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create the record in the db
-	result, err := mh.metricService.Create(metric)
+	_, err := mh.metricService.Create(metric)
 
 	// handle errors
 	if err != nil {
@@ -45,9 +45,5 @@ func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := withJSON(w, 200, result); err != nil {
-		log.WithFields(log.Fields{"error": err.Error()}).Error("error responding to client")
-		boom.BadImplementation(w)
-		return
-	}
+	w.WriteHeader(200)
 }

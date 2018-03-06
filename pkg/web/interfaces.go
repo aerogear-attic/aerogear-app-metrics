@@ -7,5 +7,5 @@ type MetricsServiceInterface interface {
 }
 
 type HealthCheckable interface {
-	IsHealthy() (bool, error)
+	IsHealthy() error
 }
