@@ -72,7 +72,7 @@ func TestMetricValidate(t *testing.T) {
 			ExpectedReason: "",
 		},
 		{
-			Name:           "Security Metrics with missing type field should be invalid",
+			Name:           "Security Metrics with missing id field should be invalid",
 			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Id: nil, Name: &securityMetricName, Passed: &securityMetricPassed}}}},
 			Valid:          false,
 			ExpectedReason: fmt.Sprintf(securityMetricMissingIdError, 0),
