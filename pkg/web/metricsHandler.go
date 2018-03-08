@@ -45,5 +45,5 @@ func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(200)
+	w.WriteHeader(204)
 }
