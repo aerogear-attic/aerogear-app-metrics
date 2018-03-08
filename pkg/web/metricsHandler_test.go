@@ -64,7 +64,7 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 	defer res.Body.Close()
 	_, err = ioutil.ReadAll(res.Body)
 
-	assert.Equal(t, 200, res.StatusCode)
+	assert.Equal(t, 204, res.StatusCode)
 
 	mockMetricsService.AssertExpectations(t)
 }
