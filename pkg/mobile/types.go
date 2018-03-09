@@ -23,6 +23,9 @@ type Metric struct {
 	ClientId string `json:"clientId"`
 	// required: true
 	Data *MetricData `json:"data,omitempty"`
+	// required: true
+	// example: init
+	EventType string `json:"type"`
 }
 
 // swagger:model
@@ -73,18 +76,28 @@ type SecurityMetric struct {
 }
 
 const clientIdMaxLength = 128
+const eventTypeMaxLength = 128
 const securityMetricsMaxLength = 30
 
 const missingClientIdError = "missing clientId in payload"
-const invalidTimestampError = "timestamp must be a valid number"
+const missingEventTypeError = "missing type in payload"
+const unknownTypeError = "payload type unknown"
+const missingAppError = "missing data.app in init-type payload"
+const missingDeviceError = "missing data.device in init-type payload"
+const missingSecurityError = "missing data.security in security-type payload"
 const missingDataError = "missing metrics data in payload"
 const initMetricsIncompleteError = "data.app and data.security must both be present simultaneously"
+
+const invalidTimestampError = "timestamp must be a valid number"
 const securityMetricsEmptyError = "data.security cannot be empty"
 const securityMetricMissingIdError = "invalid element in data.security at position %v, id must be included"
 const securityMetricMissingNameError = "invalid element in data.security at position %v, name must be included"
 const securityMetricMissingPassedError = "invalid element in data.security at position %v, passed must be included"
 
 var clientIdLengthError = fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength)
+
+var eventTypeLengthError = fmt.Sprintf("type exceeded maximum length of %v", eventTypeMaxLength)
+
 var securityMetricsLengthError = fmt.Sprintf("maximum length of data.security %v", securityMetricsMaxLength)
 
 func (m *Metric) Validate() (valid bool, reason string) {
@@ -94,6 +107,14 @@ func (m *Metric) Validate() (valid bool, reason string) {
 
 	if len(m.ClientId) > clientIdMaxLength {
 		return false, clientIdLengthError
+	}
+
+	if m.EventType == "" {
+		return false, missingEventTypeError
+	}
+
+	if len(m.EventType) > eventTypeMaxLength {
+		return false, eventTypeLengthError
 	}
 
 	if m.ClientTimestamp != "" {
@@ -107,27 +128,50 @@ func (m *Metric) Validate() (valid bool, reason string) {
 		return false, missingDataError
 	}
 
-	if (m.Data.Device != nil && m.Data.App == nil) || (m.Data.Device == nil && m.Data.App != nil) {
-		return false, initMetricsIncompleteError
+	switch m.EventType {
+	case "init":
+		return validateInitMetric(m.Data)
+	case "security":
+		return validateSecurityMetric(m.Data)
+	default:
+		return false, unknownTypeError
+	}
+}
+
+func validateInitMetric(data *MetricData) (valid bool, reason string) {
+	if data.App == nil {
+		return false, missingAppError
+	}
+	if data.Device == nil {
+		return false, missingDeviceError
+	}
+	return true, ""
+}
+
+func validateSecurityMetric(data *MetricData) (valid bool, reason string) {
+	// security type includes data from 'init'
+	if ok, reason := validateInitMetric(data); !ok {
+		return false, reason
+	}
+	if data.Security == nil {
+		return false, missingSecurityError
 	}
 
-	if m.Data.Security != nil {
-		if len(*m.Data.Security) == 0 {
-			return false, securityMetricsEmptyError
+	if len(*data.Security) == 0 {
+		return false, securityMetricsEmptyError
+	}
+	if len(*data.Security) > securityMetricsMaxLength {
+		return false, securityMetricsLengthError
+	}
+	for i, sm := range *data.Security {
+		if sm.Id == nil {
+			return false, fmt.Sprintf(securityMetricMissingIdError, i)
 		}
-		if len(*m.Data.Security) > securityMetricsMaxLength {
-			return false, securityMetricsLengthError
+		if sm.Name == nil {
+			return false, fmt.Sprintf(securityMetricMissingNameError, i)
 		}
-		for i, sm := range *m.Data.Security {
-			if sm.Id == nil {
-				return false, fmt.Sprintf(securityMetricMissingIdError, i)
-			}
-			if sm.Name == nil {
-				return false, fmt.Sprintf(securityMetricMissingNameError, i)
-			}
-			if sm.Passed == nil {
-				return false, fmt.Sprintf(securityMetricMissingPassedError, i)
-			}
+		if sm.Passed == nil {
+			return false, fmt.Sprintf(securityMetricMissingPassedError, i)
 		}
 	}
 	return true, ""

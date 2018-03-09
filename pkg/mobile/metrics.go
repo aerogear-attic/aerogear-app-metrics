@@ -24,11 +24,11 @@ func (m MetricsService) Create(metric Metric) (Metric, error) {
 
 	// happens if timestamp is empty
 	if err != nil {
-		return metric, m.mdao.Create(metric.ClientId, metricsData, nil)
+		return metric, m.mdao.Create(metric.ClientId, metric.EventType, metricsData, nil)
 	}
 
 	// convert to time object
 	clientTime := time.Unix(t, 0)
 
-	return metric, m.mdao.Create(metric.ClientId, metricsData, &clientTime)
+	return metric, m.mdao.Create(metric.ClientId, metric.EventType, metricsData, &clientTime)
 }
