@@ -10,8 +10,8 @@ type MetricsDAO struct {
 }
 
 // Create a metrics record
-func (m *MetricsDAO) Create(clientId string, metricsData []byte, clientTime *time.Time) error {
-	_, err := m.db.Exec("INSERT INTO mobileappmetrics(clientId, data, client_time) VALUES($1, $2, $3)", clientId, metricsData, clientTime)
+func (m *MetricsDAO) Create(clientId string, eventType string, metricsData []byte, clientTime *time.Time) error {
+	_, err := m.db.Exec("INSERT INTO mobileappmetrics(clientId, event_type, data, client_time) VALUES($1, $2, $3, $4)", clientId, eventType, metricsData, clientTime)
 	return err
 }
 
