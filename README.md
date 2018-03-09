@@ -84,6 +84,8 @@ docker-compose up
 
 This section shows an example `curl` request which can be used to send some data to the `/metrics` endpoint.
 
+#### Init type metric request
+
 ```
 curl -i -X POST \
   http://localhost:3000/metrics \
@@ -92,6 +94,7 @@ curl -i -X POST \
   -H 'Postman-Token: 87bf2b99-7cdc-8df9-9b2d-6cdcd2932159' \
   -d '{
   "clientId": "453de7432",
+  "type": "init",
   "data": {
     "app": {
       "appId": "com.example.someApp",
@@ -102,6 +105,48 @@ curl -i -X POST \
       "platform": "android",
       "platformVersion": "27"
     }
+  }
+}'
+```
+
+#### Security metric type payload
+```
+curl -i -X POST \
+  http://localhost:3000/metrics \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 87bf2b99-7cdc-8df9-9b2d-6cdcd2932159' \
+  -d '{
+  "clientId": "453de7432",
+  "type": "security",
+  "data": {
+    "security": [
+      {
+        "id": "org.aerogear.mobile.security.checks.DeveloperModeCheck",
+        "name": "Developer Mode Check",
+        "passed": true
+      },
+     {
+        "id": "org.aerogear.mobile.security.checks.EmulatorCheck",
+        "name": "Emulator Check",
+        "passed": false
+      },
+      {
+        "id": "org.aerogear.mobile.security.checks.DebuggerCheck",
+        "name": "Debugger Check",
+        "passed": false
+      },
+      {
+        "id": "org.aerogear.mobile.security.checks.RootedCheck",
+        "name": "Rooted Check",
+        "passed": false
+      },
+      {
+        "id": "org.aerogear.mobile.security.checks.ScreenLockCheck",
+        "name": "Screen Lock Check",
+        "passed": false
+      }
+    ]
   }
 }'
 ```
