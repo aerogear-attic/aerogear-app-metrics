@@ -23,37 +23,19 @@ type MetricData struct {
 	Security *SecurityMetrics `json:"security,omitempty"`
 }
 
-type AppMetric struct {
-	ID         string `json:"appId"`
-	SDKVersion string `json:"sdkVersion"`
-	AppVersion string `json:"appVersion"`
-}
-
-type DeviceMetric struct {
-	Platform        string `json:"platform"`
-	PlatformVersion string `json:"platformVersion"`
-}
-
 type SecurityMetrics []SecurityMetric
 
-type SecurityMetric struct {
-	Id     *string `json:"id,omitempty"`
-	Name   *string `json:"name,omitempty"`
-	Passed *bool   `json:"passed,omitempty"`
-}
-
 const clientIdMaxLength = 128
-const securityMetricsMaxLength = 30
+const eventTypeMaxLength = 128
 
 const missingClientIdError = "missing clientId in payload"
-const invalidTimestampError = "timestamp must be a valid number"
 const missingDataError = "missing metrics data in payload"
 const securityMetricsEmptyError = "data.security cannot be empty"
-const securityMetricMissingIdError = "invalid element in data.security at position %v, id must be included"
-const securityMetricMissingNameError = "invalid element in data.security at position %v, name must be included"
-const securityMetricMissingPassedError = "invalid element in data.security at position %v, passed must be included"
+
+const invalidTimestampError = "timestamp must be a valid number"
 
 var clientIdLengthError = fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength)
+
 var securityMetricsLengthError = fmt.Sprintf("maximum length of data.security %v", securityMetricsMaxLength)
 
 func (m *Metric) Validate() (valid bool, reason string) {
@@ -76,6 +58,18 @@ func (m *Metric) Validate() (valid bool, reason string) {
 		return false, missingDataError
 	}
 
+	if m.Data.App != nil {
+		if valid, reason := m.Data.App.Validate(); !valid {
+			return valid, reason
+		}
+	}
+
+	if m.Data.Device != nil {
+		if valid, reason := m.Data.Device.Validate(); !valid {
+			return valid, reason
+		}
+	}
+
 	if m.Data.Security != nil {
 		if len(*m.Data.Security) == 0 {
 			return false, securityMetricsEmptyError
@@ -83,15 +77,9 @@ func (m *Metric) Validate() (valid bool, reason string) {
 		if len(*m.Data.Security) > securityMetricsMaxLength {
 			return false, securityMetricsLengthError
 		}
-		for i, sm := range *m.Data.Security {
-			if sm.Id == nil {
-				return false, fmt.Sprintf(securityMetricMissingIdError, i)
-			}
-			if sm.Name == nil {
-				return false, fmt.Sprintf(securityMetricMissingNameError, i)
-			}
-			if sm.Passed == nil {
-				return false, fmt.Sprintf(securityMetricMissingPassedError, i)
+		for i, securityCheck := range *m.Data.Security {
+			if valid, reason := securityCheck.Validate(i); !valid {
+				return valid, reason
 			}
 		}
 	}
