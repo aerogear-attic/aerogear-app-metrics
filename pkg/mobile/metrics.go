@@ -1,7 +1,6 @@
 package mobile
 
 import (
-	"encoding/json"
 	"time"
 )
 
@@ -14,21 +13,15 @@ func NewMetricsService(dao MetricCreator) *MetricsService {
 }
 
 func (m MetricsService) Create(metric Metric) (Metric, error) {
-	metricsData, err := json.Marshal(metric.Data)
-
-	if err != nil {
-		return metric, err
-	}
-
 	t, err := metric.ClientTimestamp.Int64()
 
 	// happens if timestamp is empty
 	if err != nil {
-		return metric, m.mdao.Create(metric.ClientId, metricsData, nil)
+		return metric, m.mdao.Create(metric.ClientId, metric, nil)
 	}
 
 	// convert to time object
 	clientTime := time.Unix(t, 0)
 
-	return metric, m.mdao.Create(metric.ClientId, metricsData, &clientTime)
+	return metric, m.mdao.Create(metric.ClientId, metric, &clientTime)
 }

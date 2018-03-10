@@ -56,7 +56,9 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 		clientId varchar NOT NULL CHECK (clientId <> ''),
 		event_time timestamptz NOT NULL DEFAULT now(),
 		client_time timestamptz DEFAULT now(),
-		data jsonb NOT NULL
+		app_id varchar NOT NULL,
+		sdk_version varchar NOT NULL,
+		app_version varchar NOT NULL
 	)`); err != nil {
 		return err
 	}

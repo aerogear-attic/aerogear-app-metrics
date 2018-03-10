@@ -3,16 +3,99 @@ package dao
 import (
 	"database/sql"
 	"time"
+
+	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 )
 
 type MetricsDAO struct {
 	db *sql.DB
 }
 
-// Create a metrics record
-func (m *MetricsDAO) Create(clientId string, metricsData []byte, clientTime *time.Time) error {
-	_, err := m.db.Exec("INSERT INTO mobileappmetrics(clientId, data, client_time) VALUES($1, $2, $3)", clientId, metricsData, clientTime)
+func (m *MetricsDAO) RunInTransaction(cb func(*sql.Tx) error) (err error) {
+	tx, err := m.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if e := recover(); e != nil {
+			tx.Rollback()
+			panic(e)
+		}
+		if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+	err = cb(tx)
 	return err
+}
+
+// Create a metrics record
+func (m *MetricsDAO) Create(clientId string, metric mobile.Metric, clientTime *time.Time) error {
+	eventTime := time.Now()
+	return m.RunInTransaction(func(tx *sql.Tx) error {
+		if metric.Data.App != nil {
+			appMetric := metric.Data.App
+			if _, err := tx.Exec(`INSERT INTO mobilemetrics_app (
+				clientId,
+				client_time,
+				event_time,
+				app_id,
+				sdk_version,
+				app_version
+			) VALUES($1, $2, $3, $4, $5, $6)`,
+				clientId,
+				clientTime,
+				eventTime,
+				appMetric.ID,
+				appMetric.SDKVersion,
+				appMetric.AppVersion,
+			); err != nil {
+				return err
+			}
+		}
+		if metric.Data.Device != nil {
+			deviceMetric := metric.Data.Device
+			if _, err := tx.Exec(`INSERT INTO mobilemetrics_device (
+				clientId,
+				client_time,
+				event_time,
+				platform,
+				platform_version
+			) VALUES($1, $2, $3, $4, $5)`,
+				clientId,
+				clientTime,
+				eventTime,
+				deviceMetric.Platform,
+				deviceMetric.PlatformVersion,
+			); err != nil {
+				return err
+			}
+		}
+		if metric.Data.Security != nil {
+			for _, securityMetric := range *metric.Data.Security {
+				if _, err := tx.Exec(`INSERT INTO mobilemetrics_security (
+					clientId,
+					client_time,
+					event_time,
+					id,
+					name,
+					passed
+				) VALUES($1, $2, $3, $4, $5, $6)`,
+					clientId,
+					clientTime,
+					eventTime,
+					securityMetric.Id,
+					securityMetric.Name,
+					securityMetric.Passed,
+				); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
 }
 
 // IsHealthy checks that we are connected to the database
