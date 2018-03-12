@@ -1,5 +1,19 @@
 {
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
   "swagger": "2.0",
+  "info": {
+    "description": "API for the Metrics for the AeroGear Metrics Service",
+    "version": "0.0.1"
+  },
+  "host": "localhost:3000",
   "paths": {
     "/healthz": {
       "get": {

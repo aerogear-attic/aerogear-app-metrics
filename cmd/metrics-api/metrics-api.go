@@ -1,3 +1,18 @@
+// API for the Metrics for the AeroGear Metrics Service
+//     Schemes: http
+//     Title: AeroGear Metrics Service API
+//     Version: 0.0.1
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Host: localhost:3000
+//
+//
+// swagger:meta
 package main
 
 //go:generate swagger generate spec -m -i ../../swagger.yml -o ../../swagger.json
