@@ -5,41 +5,71 @@ import (
 	"fmt"
 )
 
+// swagger:ignore
 type AppConfig struct {
 	DBConnectionString string
 }
 
 // ClientMetric struct is what the client payload should be parsed into
 // Need to figure out how to structure this
+//
+// swagger:model
 type Metric struct {
+	// required: true
+	// example: 1520853523661
 	ClientTimestamp json.Number `json:"timestamp,omitempty"`
-	ClientId        string      `json:"clientId"`
-	Data            *MetricData `json:"data,omitempty"`
+	// required: true
+	// example: some-unique-client-id
+	ClientId string `json:"clientId"`
+	// required: true
+	Data *MetricData `json:"data,omitempty"`
 }
 
+// swagger:model
 type MetricData struct {
-	App      *AppMetric       `json:"app,omitempty"`
-	Device   *DeviceMetric    `json:"device,omitempty"`
+	// required: true
+	App *AppMetric `json:"app,omitempty"`
+	// required: true
+	Device *DeviceMetric `json:"device,omitempty"`
+	// required: true
 	Security *SecurityMetrics `json:"security,omitempty"`
 }
 
+// swagger:model
 type AppMetric struct {
-	ID         string `json:"appId"`
+	// required: true
+	// example: com.example.myapp
+	ID string `json:"appId"`
+	// required: true
+	// example: 1.0.0
 	SDKVersion string `json:"sdkVersion"`
+	// required: true
+	// example: 2.1.0
 	AppVersion string `json:"appVersion"`
 }
 
+// swagger:model
 type DeviceMetric struct {
-	Platform        string `json:"platform"`
+	// required: true
+	// example: android
+	Platform string `json:"platform"`
+	// required: true
+	// example: 27
 	PlatformVersion string `json:"platformVersion"`
 }
 
 type SecurityMetrics []SecurityMetric
 
+// swagger:model
 type SecurityMetric struct {
-	Id     *string `json:"id,omitempty"`
-	Name   *string `json:"name,omitempty"`
-	Passed *bool   `json:"passed,omitempty"`
+	// required: true
+	// example: com.example.DeveloperMode
+	Id *string `json:"id,omitempty"`
+	// required: true
+	// example: Developer Mode
+	Name *string `json:"name,omitempty"`
+	// required: true
+	Passed *bool `json:"passed,omitempty"`
 }
 
 const clientIdMaxLength = 128
