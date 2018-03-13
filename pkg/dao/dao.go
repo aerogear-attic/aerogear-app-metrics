@@ -37,14 +37,19 @@ func (m *MetricsDAO) Create(clientId string, metric mobile.Metric, clientTime *t
 	return m.RunInTransaction(func(tx *sql.Tx) error {
 		if metric.Data.App != nil {
 			appMetric := metric.Data.App
-			if _, err := tx.Exec(`INSERT INTO mobilemetrics_app (
+			stmt, err := tx.Prepare(`INSERT INTO mobilemetrics_app (
 				clientId,
 				client_time,
 				event_time,
 				app_id,
 				sdk_version,
 				app_version
-			) VALUES($1, $2, $3, $4, $5, $6)`,
+			) VALUES($1, $2, $3, $4, $5, $6)`)
+			if err != nil {
+				return err
+			}
+
+			if _, err := stmt.Exec(
 				clientId,
 				clientTime,
 				eventTime,
@@ -57,13 +62,17 @@ func (m *MetricsDAO) Create(clientId string, metric mobile.Metric, clientTime *t
 		}
 		if metric.Data.Device != nil {
 			deviceMetric := metric.Data.Device
-			if _, err := tx.Exec(`INSERT INTO mobilemetrics_device (
+			stmt, err := tx.Prepare(`INSERT INTO mobilemetrics_device (
 				clientId,
 				client_time,
 				event_time,
 				platform,
 				platform_version
-			) VALUES($1, $2, $3, $4, $5)`,
+			) VALUES($1, $2, $3, $4, $5)`)
+			if err != nil {
+				return err
+			}
+			if _, err := stmt.Exec(
 				clientId,
 				clientTime,
 				eventTime,
@@ -74,15 +83,19 @@ func (m *MetricsDAO) Create(clientId string, metric mobile.Metric, clientTime *t
 			}
 		}
 		if metric.Data.Security != nil {
+			stmt, err := tx.Prepare(`INSERT INTO mobilemetrics_security (
+				clientId,
+				client_time,
+				event_time,
+				id,
+				name,
+				passed
+			) VALUES($1, $2, $3, $4, $5, $6)`)
+			if err != nil {
+				return err
+			}
 			for _, securityMetric := range *metric.Data.Security {
-				if _, err := tx.Exec(`INSERT INTO mobilemetrics_security (
-					clientId,
-					client_time,
-					event_time,
-					id,
-					name,
-					passed
-				) VALUES($1, $2, $3, $4, $5, $6)`,
+				if _, err := stmt.Exec(
 					clientId,
 					clientTime,
 					eventTime,

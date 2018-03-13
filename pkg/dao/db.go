@@ -52,7 +52,7 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 	if handler.DB == nil {
 		return errors.New("cannot setup database, must call Connect() first")
 	}
-	if _, err := handler.DB.Exec(`CREATE TABLE IF NOT EXISTS mobilemetrics_app(
+	if _, err := handler.DB.Exec(`CREATE UNLOGGED TABLE IF NOT EXISTS mobilemetrics_app(
 		clientId varchar NOT NULL CHECK (clientId <> ''),
 		event_time timestamptz NOT NULL DEFAULT now(),
 		client_time timestamptz DEFAULT now(),
@@ -63,7 +63,7 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 		return err
 	}
 
-	if _, err := handler.DB.Exec(`CREATE TABLE IF NOT EXISTS mobilemetrics_device(
+	if _, err := handler.DB.Exec(`CREATE UNLOGGED TABLE IF NOT EXISTS mobilemetrics_device(
 		clientId varchar NOT NULL CHECK (clientId <> ''),
 		event_time timestamptz NOT NULL DEFAULT now(),
 		client_time timestamptz DEFAULT now(),
@@ -73,7 +73,7 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 		return err
 	}
 
-	if _, err := handler.DB.Exec(`CREATE TABLE IF NOT EXISTS mobilemetrics_security(
+	if _, err := handler.DB.Exec(`CREATE UNLOGGED TABLE IF NOT EXISTS mobilemetrics_security(
 		clientId varchar NOT NULL CHECK (clientId <> ''),
 		event_time timestamptz NOT NULL DEFAULT now(),
 		client_time timestamptz DEFAULT now(),
