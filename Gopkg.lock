@@ -26,13 +26,14 @@
   version = "v1.6.1"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/lib/pq"
+  name = "github.com/influxdata/influxdb"
   packages = [
-    ".",
-    "oid"
+    "client/v2",
+    "models",
+    "pkg/escape"
   ]
-  revision = "88edab0803230a3898347e77b474f8c1820a1f20"
+  revision = "6ac835404e7e64ea7299a6eebcce1ab1ef15fe3c"
+  version = "v1.5.0"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -79,6 +80,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4d09c8433fad05834af31d008c3f70a2af9d7a17c471c4f82a94d23904d3d70a"
+  inputs-digest = "e3c396a6542961f7a2f617901862df04b77eb423e9f519ae7bb2e53a7057e659"
   solver-name = "gps-cdcl"
   solver-version = 1

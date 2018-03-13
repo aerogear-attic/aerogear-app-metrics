@@ -9,6 +9,10 @@ services:
       POSTGRESQL_PASSWORD: postgres
       POSTGRESQL_USER: postgresql
       POSTGRESQL_DATABASE: aerogear_mobile_metrics
+  influx:
+    image: influxdb
+    ports:
+      - "8086:8086"
   api:
     build:
       context: .

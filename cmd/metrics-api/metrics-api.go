@@ -23,13 +23,12 @@ func main() {
 	if err != nil {
 		panic("failed to connect to sql database : " + err.Error())
 	}
-	defer dbHandler.DB.Close()
 
 	if err := dbHandler.DoInitialSetup(); err != nil {
 		panic("failed to perform database setup : " + err.Error())
 	}
 
-	metricsDao := dao.NewMetricsDAO(dbHandler.DB)
+	metricsDao := dao.NewMetricsDAO()
 	router := web.NewRouter()
 
 	//metrics route
