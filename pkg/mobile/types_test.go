@@ -17,6 +17,12 @@ func TestMetricValidate(t *testing.T) {
 		bigSecurityMetricList = append(bigSecurityMetricList, SecurityMetric{Id: &securityMetricId, Passed: &securityMetricPassed})
 	}
 
+	validAppMetric := &AppMetric{
+		SDKVersion: "1",
+		ID:         "some-app-id",
+		AppVersion: "1",
+	}
+
 	testCases := []struct {
 		Name           string
 		Metric         Metric
@@ -31,13 +37,13 @@ func TestMetricValidate(t *testing.T) {
 		},
 		{
 			Name:           "Metric with no clientId should be invalid",
-			Metric:         Metric{Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Metric:         Metric{Data: &MetricData{App: validAppMetric}},
 			Valid:          false,
 			ExpectedReason: missingClientIdError,
 		},
 		{
 			Name:           "Metric with long clientId should be invalid",
-			Metric:         Metric{ClientId: strings.Join(make([]string, clientIdMaxLength+10), "a"), Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Metric:         Metric{ClientId: strings.Join(make([]string, clientIdMaxLength+10), "a"), Data: &MetricData{App: validAppMetric}},
 			Valid:          false,
 			ExpectedReason: clientIdLengthError,
 		},
@@ -55,19 +61,19 @@ func TestMetricValidate(t *testing.T) {
 		},
 		{
 			Name:           "Metric with ClientId and Some Data should be valid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{App: validAppMetric}},
 			Valid:          true,
 			ExpectedReason: "",
 		},
 		{
 			Name:           "Metric with bad timestamp should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "invalid", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "invalid", Data: &MetricData{App: validAppMetric}},
 			Valid:          false,
 			ExpectedReason: invalidTimestampError,
 		},
 		{
 			Name:           "Metric with valid timestamp should be valid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "12345", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "12345", Data: &MetricData{App: validAppMetric}},
 			Valid:          true,
 			ExpectedReason: "",
 		},
