@@ -82,11 +82,10 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 		id char(80) NOT NULL,
 		name char(40) NOT NULL,
 		passed boolean,
-		PRIMARY KEY (clientId, event_time)
+		PRIMARY KEY (clientId, event_time, id)
 	)`); err != nil {
 		return err
 	}
 
 	return nil
-
 }
