@@ -52,7 +52,13 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 	if handler.DB == nil {
 		return errors.New("cannot setup database, must call Connect() first")
 	}
-	if _, err := handler.DB.Exec("CREATE UNLOGGED TABLE IF NOT EXISTS mobileappmetrics(clientId varchar NOT NULL CHECK (clientId <> ''), event_time timestamptz NOT NULL DEFAULT now(), client_time timestamptz DEFAULT now(), data jsonb NOT NULL)"); err != nil {
+	if _, err := handler.DB.Exec(`CREATE UNLOGGED TABLE IF NOT EXISTS mobileappmetrics (
+		clientId char(80) NOT NULL CHECK (clientId <> ''),
+		event_time timestamptz NOT NULL DEFAULT now(),
+		client_time timestamptz DEFAULT now(),
+		data jsonb NOT NULL,
+		PRIMARY KEY(clientId, event_time)
+		)`); err != nil {
 		return err
 	}
 	return nil
