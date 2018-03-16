@@ -25,7 +25,6 @@ type SeedOptions struct {
 
 type SeedData struct {
 	clients          []string
-	appIds           []string
 	appVersions      []string
 	sdkVersions      []string
 	platformVersions []string
@@ -67,13 +66,11 @@ func main() {
 
 	// generate fixtures to be selected from
 	clients := makeRandomStrings(opts.clients, clientIdLen)
-	appIds := makeRandomStrings(opts.apps, appIdLen)
 	appVersions := makeRandomSemvers(opts.appVersions)
 	sdkVersions := makeRandomSemvers(opts.sdkVersions)
 	platformVersions := makeRandomSemvers(opts.platformVersions)
 	seedData := &SeedData{
 		clients:          clients,
-		appIds:           appIds,
 		appVersions:      appVersions,
 		sdkVersions:      sdkVersions,
 		platformVersions: platformVersions,
@@ -125,7 +122,7 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	metricData := new(mobile.MetricData)
 	if (opts.metricsTypes & appAndDeviceMetrics) == appAndDeviceMetrics {
 		metricData.App = &mobile.AppMetric{
-			ID:         fixtures.appIds[rand.Intn(opts.apps)],
+			ID:         fmt.Sprintf("app%d", rand.Intn(opts.apps)),
 			AppVersion: fixtures.appVersions[rand.Intn(opts.appVersions)],
 			SDKVersion: fixtures.sdkVersions[rand.Intn(opts.sdkVersions)],
 		}
