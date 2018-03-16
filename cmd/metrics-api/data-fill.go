@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"time"
@@ -20,6 +21,14 @@ type SeedOptions struct {
 	sdkVersions      int
 	platformVersions int
 	metricsTypes     int
+}
+
+type SeedData struct {
+	clients          []string
+	appIds           []string
+	appVersions      []string
+	sdkVersions      []string
+	platformVersions []string
 }
 
 var platforms = []string{"android", "ios", "cordova"}
@@ -44,6 +53,7 @@ func main() {
 	flag.IntVar(&opts.clients, "clients", 100, "Number of different clients to generate")
 	flag.IntVar(&opts.appVersions, "appVersions", 3, "Number of different appVersions to use")
 	flag.IntVar(&opts.sdkVersions, "sdkVersions", 3, "Number of different sdkVersions to generate")
+	flag.IntVar(&opts.platformVersions, "platformVersions", 3, "Number of different platformVersions to generate")
 
 	// TODO: make metrics types selectable
 	opts.metricsTypes = appAndDeviceMetrics | securityMetrics
@@ -53,11 +63,30 @@ func main() {
 		os.Exit(1)
 	}
 
+	// generate fixtures to be selected from
+	clients := makeRandomStrings(opts.clients, clientIdLen)
+	appIds := makeRandomStrings(opts.apps, appIdLen)
+	appVersions := makeRandomSemvers(opts.appVersions)
+	sdkVersions := makeRandomSemvers(opts.sdkVersions)
+	platformVersions := makeRandomSemvers(opts.platformVersions)
+	seedData := &SeedData{
+		clients:          clients,
+		appIds:           appIds,
+		appVersions:      appVersions,
+		sdkVersions:      sdkVersions,
+		platformVersions: platformVersions,
+	}
+
 	service := initMetricsService()
 	for i := 0; i < n; i++ {
-		metric := generateMetrics(opts)
+		metric := generateMetrics(opts, seedData)
 		// TODO: add options to send metric via HTTP and print JSON to stdout
-		service.Create(*metric)
+		_, err := service.Create(*metric)
+		if err != nil {
+			log.Printf("Error creating record %d: %v\n", i+1, err)
+		} else {
+			fmt.Printf("Created record %d\n", i+1)
+		}
 	}
 }
 
@@ -71,7 +100,6 @@ func initMetricsService() *mobile.MetricsService {
 	if err != nil {
 		panic("failed to connect to sql database : " + err.Error())
 	}
-	defer dbHandler.DB.Close()
 
 	if err := dbHandler.DoInitialSetup(); err != nil {
 		panic("failed to perform database setup : " + err.Error())
@@ -83,19 +111,12 @@ func initMetricsService() *mobile.MetricsService {
 	return metricsService
 }
 
-func generateMetrics(opts *SeedOptions) *mobile.Metric {
+func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	seedValue := opts.seed
 	if seedValue == 0 {
 		seedValue = time.Now().UnixNano()
 	}
 	rand.Seed(seedValue)
-
-	// generate fixtures to be selected from
-	clients := makeRandomStrings(opts.clients, clientIdLen)
-	appIds := makeRandomStrings(opts.apps, appIdLen)
-	appVersions := makeRandomSemvers(opts.appVersions)
-	sdkVersions := makeRandomSemvers(opts.sdkVersions)
-	platformVersions := makeRandomSemvers(opts.platformVersions)
 
 	securityIds := make([]string, len(securityNames))
 	for i := 0; i < len(securityNames); i++ {
@@ -105,13 +126,13 @@ func generateMetrics(opts *SeedOptions) *mobile.Metric {
 	metricData := new(mobile.MetricData)
 	if (opts.metricsTypes & appAndDeviceMetrics) == appAndDeviceMetrics {
 		metricData.App = &mobile.AppMetric{
-			ID:         appIds[rand.Intn(opts.apps)],
-			AppVersion: appVersions[rand.Intn(opts.appVersions)],
-			SDKVersion: sdkVersions[rand.Intn(opts.sdkVersions)],
+			ID:         fixtures.appIds[rand.Intn(opts.apps)],
+			AppVersion: fixtures.appVersions[rand.Intn(opts.appVersions)],
+			SDKVersion: fixtures.sdkVersions[rand.Intn(opts.sdkVersions)],
 		}
 		metricData.Device = &mobile.DeviceMetric{
 			Platform:        platforms[rand.Intn(len(platforms))],
-			PlatformVersion: platformVersions[rand.Intn(len(platformVersions))],
+			PlatformVersion: fixtures.platformVersions[rand.Intn(opts.platformVersions)],
 		}
 	}
 	if (opts.metricsTypes & securityMetrics) == securityMetrics {
@@ -131,7 +152,7 @@ func generateMetrics(opts *SeedOptions) *mobile.Metric {
 		metricData.Security = &security
 	}
 	metric := new(mobile.Metric)
-	metric.ClientId = clients[rand.Intn(len(clients))]
+	metric.ClientId = fixtures.clients[rand.Intn(opts.clients)]
 	metric.Data = metricData
 
 	return metric
