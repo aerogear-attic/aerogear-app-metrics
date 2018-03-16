@@ -1,0 +1,207 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "API for the Metrics for the AeroGear Metrics Service",
+    "version": "0.0.1"
+  },
+  "host": "localhost:3000",
+  "paths": {
+    "/healthz": {
+      "get": {
+        "produces": [
+          "text/html"
+        ],
+        "operationId": "healthz",
+        "responses": {
+          "200": {
+            "description": "Health OK"
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "post": {
+        "description": "Creates a metric",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "operationId": "metrics",
+        "parameters": [
+          {
+            "description": "Metrics object to create",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Metric"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Metric created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "produces": [
+          "text/html"
+        ],
+        "operationId": "ping",
+        "responses": {
+          "200": {
+            "description": "Ping OK"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "AppMetric": {
+      "type": "object",
+      "required": [
+        "appId",
+        "sdkVersion",
+        "appVersion"
+      ],
+      "properties": {
+        "appId": {
+          "type": "string",
+          "x-go-name": "ID",
+          "example": "com.example.myapp"
+        },
+        "appVersion": {
+          "type": "string",
+          "x-go-name": "AppVersion",
+          "example": "2.1.0"
+        },
+        "sdkVersion": {
+          "type": "string",
+          "x-go-name": "SDKVersion",
+          "example": "1.0.0"
+        }
+      },
+      "x-go-package": "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+    },
+    "DeviceMetric": {
+      "type": "object",
+      "required": [
+        "platform",
+        "platformVersion"
+      ],
+      "properties": {
+        "platform": {
+          "type": "string",
+          "x-go-name": "Platform",
+          "example": "android"
+        },
+        "platformVersion": {
+          "type": "string",
+          "x-go-name": "PlatformVersion",
+          "example": "27"
+        }
+      },
+      "x-go-package": "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+    },
+    "Metric": {
+      "description": "ClientMetric struct is what the client payload should be parsed into\nNeed to figure out how to structure this",
+      "type": "object",
+      "required": [
+        "timestamp",
+        "clientId",
+        "data"
+      ],
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "x-go-name": "ClientId",
+          "example": "some-unique-client-id"
+        },
+        "data": {
+          "$ref": "#/definitions/MetricData"
+        },
+        "timestamp": {
+          "$ref": "#/definitions/Number"
+        }
+      },
+      "x-go-package": "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+    },
+    "MetricData": {
+      "type": "object",
+      "required": [
+        "app",
+        "device",
+        "security"
+      ],
+      "properties": {
+        "app": {
+          "$ref": "#/definitions/AppMetric"
+        },
+        "device": {
+          "$ref": "#/definitions/DeviceMetric"
+        },
+        "security": {
+          "$ref": "#/definitions/SecurityMetrics"
+        }
+      },
+      "x-go-package": "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+    },
+    "Number": {
+      "type": "string",
+      "title": "A Number represents a JSON number literal.",
+      "x-go-package": "encoding/json"
+    },
+    "SecurityMetric": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "passed"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-go-name": "Id",
+          "example": "com.example.DeveloperMode"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name",
+          "example": "Developer Mode"
+        },
+        "passed": {
+          "type": "boolean",
+          "x-go-name": "Passed"
+        }
+      },
+      "x-go-package": "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+    },
+    "SecurityMetrics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/SecurityMetric"
+      },
+      "x-go-package": "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+    }
+  }
+}

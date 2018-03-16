@@ -117,6 +117,33 @@ Password for user postgresql: # postgres
 aerogear_mobile_metrics=> select * from mobileappmetrics;
 ```
 
+### Using Swagger UI
+
+If you have the db & server running locally, you can generate and use a swagger spec as follows:
+
+```bash
+make generate
+```
+This should create a file `swagger.json` in the root of the project.
+Run the swagger UI via docker, mounting the root of the project
+
+```bash
+docker run -p 8080:8080 -e SWAGGER_JSON=/etc/swagger/swagger.json -v `pwd`:/etc/swagger swaggerapi/swagger-ui
+```
+
+Then visit http://localhost:8080 and you should see the Swagger UI.
+
+*How it works*
+
+* Operations are annotated in `router.go` e.g. metrics, healthz, ping
+  * These annotations define what the endpoint is, its method, expected content type, and the request body (via a $ref usually)
+* Models are annotated Go structs in `types.go`. The swagger spec generator reads the structs to generate the spec.
+
+*Known Issues*
+
+* The `timestamp` field is a `json.Number`. This gets generated as a `string` field in the swagger spec.
+* You may see caching issues in the browser when the swagger.json file changes (not sure why/when this happens). Clearing local storage in the browser (via developer tools) should fix it.
+
 ## Builds and Testing
 
 The `makefile` provided provides commands for building and testing the code. For now, only the most important commands are documented.

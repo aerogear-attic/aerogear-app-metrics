@@ -1,4 +1,21 @@
+// API for the Metrics for the AeroGear Metrics Service
+//     Schemes: http
+//     Title: AeroGear Metrics Service API
+//     Version: 0.0.1
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+//     Host: localhost:3000
+//
+//
+// swagger:meta
 package main
+
+//go:generate swagger generate spec -m -o ../../swagger.json
 
 import (
 	"net/http"
@@ -7,6 +24,7 @@ import (
 	"github.com/aerogear/aerogear-app-metrics/pkg/dao"
 	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 	"github.com/aerogear/aerogear-app-metrics/pkg/web"
+	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -46,8 +64,14 @@ func main() {
 
 	log.WithFields(log.Fields{"listenAddress": config.ListenAddress}).Info("Starting application")
 
+	// allow CORS for localhost
+	handler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:8080"},
+		AllowCredentials: true,
+	}).Handler(router)
+
 	//start
-	if err := http.ListenAndServe(config.ListenAddress, router); err != nil {
+	if err := http.ListenAndServe(config.ListenAddress, handler); err != nil {
 		panic("failed to start " + err.Error())
 	}
 }
