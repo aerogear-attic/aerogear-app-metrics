@@ -180,3 +180,5 @@ This will kick off an automated process in the CI service, where the following s
 * The docker image is pushed to the Aerogear organization in Github.
 
 The automated release process takes 2-3 minutes to complete on average.
+
+copyright AeroGear 2018.
