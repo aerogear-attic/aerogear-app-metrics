@@ -55,7 +55,9 @@ func main() {
 	flag.IntVar(&opts.sdkVersions, "sdkVersions", 3, "Number of different sdkVersions to generate")
 	flag.IntVar(&opts.platformVersions, "platformVersions", 3, "Number of different platformVersions to generate")
 
-	// TODO: make metrics types selectable
+	flag.Int64Var(&opts.seed, "seed", time.Now().UnixNano(), "Explicit seed value to use for replicable results, defaults to system time")
+
+	// TODO: make metrics types selectable or also random
 	opts.metricsTypes = appAndDeviceMetrics | securityMetrics
 
 	if n == 0 || opts.clients == 0 || opts.apps == 0 || opts.appVersions == 0 || opts.sdkVersions == 0 {
@@ -113,9 +115,6 @@ func initMetricsService() *mobile.MetricsService {
 
 func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	seedValue := opts.seed
-	if seedValue == 0 {
-		seedValue = time.Now().UnixNano()
-	}
 	rand.Seed(seedValue)
 
 	securityIds := make([]string, len(securityNames))
