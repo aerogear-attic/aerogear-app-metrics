@@ -15,7 +15,7 @@
 // swagger:meta
 package main
 
-//go:generate swagger generate spec -m -i ../../swagger.yml -o ../../swagger.json
+//go:generate swagger generate spec -m -o ../../swagger.json
 
 import (
 	"net/http"
