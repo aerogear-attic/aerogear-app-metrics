@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/aerogear/aerogear-app-metrics/pkg/config"
@@ -11,7 +13,6 @@ import (
 )
 
 type SeedOptions struct {
-	n                int
 	seed             int64
 	clients          int
 	apps             int
@@ -36,6 +37,31 @@ const clientIdLen = 30
 const appIdLen = 20
 
 func main() {
+	n := *flag.Int("n", 15000, "Number of records to generate")
+
+	opts := &SeedOptions{}
+	flag.IntVar(&opts.apps, "apps", 3, "Number of different apps to generate")
+	flag.IntVar(&opts.clients, "clients", 100, "Number of different clients to generate")
+	flag.IntVar(&opts.appVersions, "appVersions", 3, "Number of different appVersions to use")
+	flag.IntVar(&opts.sdkVersions, "sdkVersions", 3, "Number of different sdkVersions to generate")
+
+	// TODO: make metrics types selectable
+	opts.metricsTypes = appAndDeviceMetrics | securityMetrics
+
+	if n == 0 || opts.clients == 0 || opts.apps == 0 || opts.appVersions == 0 || opts.sdkVersions == 0 {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	service := initMetricsService()
+	for i := 0; i < n; i++ {
+		metric := generateMetrics(opts)
+		// TODO: add options to send metric via HTTP and print JSON to stdout
+		service.Create(*metric)
+	}
+}
+
+func initMetricsService() *mobile.MetricsService {
 	config := config.GetConfig()
 
 	dbHandler := dao.DatabaseHandler{}
@@ -54,11 +80,10 @@ func main() {
 	metricsDao := dao.NewMetricsDAO(dbHandler.DB)
 
 	metricsService := mobile.NewMetricsService(metricsDao)
-
-	generateMetrics(metricsService)
+	return metricsService
 }
 
-func generateMetrics(metricsService *mobile.MetricsService, opts *SeedOptions) {
+func generateMetrics(opts *SeedOptions) *mobile.Metric {
 	seedValue := opts.seed
 	if seedValue == 0 {
 		seedValue = time.Now().UnixNano()
@@ -86,7 +111,7 @@ func generateMetrics(metricsService *mobile.MetricsService, opts *SeedOptions) {
 		}
 		metricData.Device = &mobile.DeviceMetric{
 			Platform:        platforms[rand.Intn(len(platforms))],
-			PlatformVersion: platforms[rand.Intn(len(platforms))],
+			PlatformVersion: platformVersions[rand.Intn(len(platformVersions))],
 		}
 	}
 	if (opts.metricsTypes & securityMetrics) == securityMetrics {
@@ -108,6 +133,8 @@ func generateMetrics(metricsService *mobile.MetricsService, opts *SeedOptions) {
 	metric := new(mobile.Metric)
 	metric.ClientId = clients[rand.Intn(len(clients))]
 	metric.Data = metricData
+
+	return metric
 }
 
 func makeRandomSemvers(n int) []string {
