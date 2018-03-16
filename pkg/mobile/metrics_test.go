@@ -1,7 +1,6 @@
 package mobile
 
 import (
-	"encoding/json"
 	"errors"
 	"reflect"
 	"testing"
@@ -14,8 +13,8 @@ type MetricsDAOMock struct {
 	mock.Mock
 }
 
-func (m *MetricsDAOMock) Create(clientId string, metricsData []byte, clientTime *time.Time) error {
-	args := m.Called(clientId, metricsData, clientTime)
+func (m *MetricsDAOMock) Create(clientId string, metric Metric, clientTime *time.Time) error {
+	args := m.Called(clientId, metric, clientTime)
 	return args.Error(0)
 }
 
@@ -43,15 +42,10 @@ func TestCreateCallsDAOWithCorrectArgs(t *testing.T) {
 			},
 		},
 	}
-	expectedMetricsData, err := json.Marshal(metric.Data)
-
-	if err != nil {
-		t.Errorf("could not encode metric object to JSON")
-	}
 
 	mdaoMock, ms := newTestMetricsService()
 
-	mdaoMock.On("Create", metric.ClientId, expectedMetricsData, (*time.Time)(nil)).Return(nil)
+	mdaoMock.On("Create", metric.ClientId, metric, (*time.Time)(nil)).Return(nil)
 
 	res, err := ms.Create(metric)
 
@@ -82,18 +76,13 @@ func TestCreateReturnsErrorFromDAO(t *testing.T) {
 			},
 		},
 	}
-	expectedMetricsData, err := json.Marshal(metric.Data)
-
-	if err != nil {
-		t.Errorf("could not encode metric object to JSON")
-	}
 
 	mdaoMock, ms := newTestMetricsService()
 
 	daoError := errors.New("problem connecting to db")
-	mdaoMock.On("Create", metric.ClientId, expectedMetricsData, (*time.Time)(nil)).Return(daoError)
+	mdaoMock.On("Create", metric.ClientId, metric, (*time.Time)(nil)).Return(daoError)
 
-	_, err = ms.Create(metric)
+	_, err := ms.Create(metric)
 
 	if err.Error() != daoError.Error() {
 		t.Errorf("Metrics Service did not return the error from the DAO")
@@ -119,16 +108,11 @@ func TestCreateCallsDaoWithCorrectTimestamp(t *testing.T) {
 			},
 		},
 	}
-	expectedMetricsData, err := json.Marshal(metric.Data)
 	expectedTimestamp := time.Unix(12345, 0)
-
-	if err != nil {
-		t.Errorf("could not encode metric object to JSON")
-	}
 
 	mdaoMock, ms := newTestMetricsService()
 
-	mdaoMock.On("Create", metric.ClientId, expectedMetricsData, &expectedTimestamp).Return(nil)
+	mdaoMock.On("Create", metric.ClientId, metric, &expectedTimestamp).Return(nil)
 	res, err := ms.Create(metric)
 
 	if err != nil {

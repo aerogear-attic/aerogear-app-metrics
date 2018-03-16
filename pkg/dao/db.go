@@ -52,8 +52,40 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 	if handler.DB == nil {
 		return errors.New("cannot setup database, must call Connect() first")
 	}
-	if _, err := handler.DB.Exec("CREATE TABLE IF NOT EXISTS mobileappmetrics(clientId varchar NOT NULL CHECK (clientId <> ''), event_time timestamptz NOT NULL DEFAULT now(), client_time timestamptz DEFAULT now(), data jsonb NOT NULL)"); err != nil {
+	if _, err := handler.DB.Exec(`CREATE UNLOGGED TABLE IF NOT EXISTS mobilemetrics_app(
+		clientId char(80) NOT NULL CHECK (clientId <> ''),
+		event_time timestamptz NOT NULL DEFAULT now(),
+		client_time timestamptz DEFAULT now(),
+		app_id char(40) NOT NULL,
+		sdk_version char(20) NOT NULL,
+		app_version char(20) NOT NULL,
+		PRIMARY KEY (clientId, event_time)
+	)`); err != nil {
 		return err
 	}
+
+	if _, err := handler.DB.Exec(`CREATE UNLOGGED TABLE IF NOT EXISTS mobilemetrics_device(
+		clientId char(80) NOT NULL CHECK (clientId <> ''),
+		event_time timestamptz NOT NULL DEFAULT now(),
+		client_time timestamptz DEFAULT now(),
+		platform char(20) NOT NULL,
+		platform_version char(20) NOT NULL,
+		PRIMARY KEY (clientId, event_time)
+	)`); err != nil {
+		return err
+	}
+
+	if _, err := handler.DB.Exec(`CREATE UNLOGGED TABLE IF NOT EXISTS mobilemetrics_security(
+		clientId char(80) NOT NULL CHECK (clientId <> ''),
+		event_time timestamptz NOT NULL DEFAULT now(),
+		client_time timestamptz DEFAULT now(),
+		id char(80) NOT NULL,
+		name char(40) NOT NULL,
+		passed boolean,
+		PRIMARY KEY (clientId, event_time, id)
+	)`); err != nil {
+		return err
+	}
+
 	return nil
 }

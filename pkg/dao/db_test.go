@@ -91,16 +91,16 @@ func TestDoInitialSetup(t *testing.T) {
 		t.Errorf("DoInitialSetup() returned an error: %s", err.Error())
 	}
 
-	var exists bool
+	var tableCount int
 
-	err = dbHandler.DB.QueryRow("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'mobileappmetrics');").Scan(&exists)
+	err = dbHandler.DB.QueryRow("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name LIKE 'mobilemetrics_%';").Scan(&tableCount)
 
 	if err != nil {
 		t.Errorf("Database returned an error while checking if table exists: %s", err.Error())
 	}
 
-	if !exists {
-		t.Errorf("Expected table mobileappmetrics does not exist")
+	if !tableCount == 3 {
+		t.Errorf("Expected 3 mobilemetrics_ tables, found %v", tableCount)
 	}
 }
 
