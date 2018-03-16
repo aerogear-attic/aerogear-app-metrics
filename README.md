@@ -122,7 +122,7 @@ aerogear_mobile_metrics=> select * from mobileappmetrics;
 If you have the db & server running locally, you can generate and use a swagger spec as follows:
 
 ```bash
-go generate ./cmd/metrics-api/metrics-api.go
+make generate
 ```
 This should create a file `swagger.json` in the root of the project.
 Run the swagger UI via docker, mounting the root of the project
@@ -137,7 +137,7 @@ Then visit http://localhost:8080 and you should see the Swagger UI.
 
 * Operations are annotated in `router.go` e.g. metrics, healthz, ping
   * These annotations define what the endpoint is, its method, expected content type, and the request body (via a $ref usually)
-* Models are annotated Go structs in `types.go`. The swagger spec generator reads the strcuts to generate the spec.
+* Models are annotated Go structs in `types.go`. The swagger spec generator reads the structs to generate the spec.
 
 *Known Issues*
 
