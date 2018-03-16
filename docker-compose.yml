@@ -9,6 +9,10 @@ services:
       POSTGRESQL_PASSWORD: postgres
       POSTGRESQL_USER: postgresql
       POSTGRESQL_DATABASE: aerogear_mobile_metrics
+  grafana:
+    image: aerogearcatalog/grafana
+    ports:
+      - "3123:3000"
   api:
     build:
       context: .
