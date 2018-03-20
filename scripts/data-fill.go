@@ -16,13 +16,14 @@ import (
 )
 
 type SeedOptions struct {
-	seed             int64
-	clients          int
-	apps             int
-	appVersions      int
-	sdkVersions      int
-	platformVersions int
-	metricsTypes     int
+	seed               int64
+	clients            int
+	apps               int
+	appVersions        int
+	sdkVersions        int
+	platformVersions   int
+	metricsTypes       int
+	securityFailChance float64
 }
 
 type SeedData struct {
@@ -43,8 +44,6 @@ var securityIds = []string{
 	"org.aerogear.mobile.security.checks.ScreenLockCheck",
 }
 
-var boolGenerator = &genCache{}
-
 const (
 	appAndDeviceMetrics = 1 << iota
 	securityMetrics     = 1 << iota
@@ -54,7 +53,7 @@ const clientIdLen = 30
 const appIdLen = 20
 
 func main() {
-	n := flag.Int("n", 15000, "Number of records to generate")
+	n := flag.Int("n", 1000, "Number of records to generate")
 
 	opts := &SeedOptions{}
 	flag.IntVar(&opts.apps, "apps", 3, "Number of different apps to generate")
@@ -62,6 +61,7 @@ func main() {
 	flag.IntVar(&opts.appVersions, "appVersions", 3, "Number of different appVersions to use")
 	flag.IntVar(&opts.sdkVersions, "sdkVersions", 3, "Number of different sdkVersions to generate")
 	flag.IntVar(&opts.platformVersions, "platformVersions", 3, "Number of different platformVersions to generate")
+	flag.Float64Var(&opts.securityFailChance, "fail", 0.2, "Float chance of a security check failing randomly, use 0 to always pass")
 
 	flag.Int64Var(&opts.seed, "seed", time.Now().UnixNano(), "Explicit seed value to use for replicable results, defaults to system time")
 
@@ -74,6 +74,9 @@ func main() {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
+
+	seedValue := opts.seed
+	rand.Seed(seedValue)
 
 	// generate fixtures to be selected from
 	clients := makeRandomStrings(opts.clients, clientIdLen)
@@ -122,14 +125,6 @@ func initMetricsService() *mobile.MetricsService {
 }
 
 func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
-	seedValue := opts.seed
-	rand.Seed(seedValue)
-
-	securityIds := make([]string, len(securityNames))
-	for i := 0; i < len(securityNames); i++ {
-		securityIds[i] = "org.aerogear.mobile.security.checks." + securityNames[i]
-	}
-
 	metricData := &mobile.MetricData{}
 	if (opts.metricsTypes & appAndDeviceMetrics) == appAndDeviceMetrics {
 		metricData.App = &mobile.AppMetric{
@@ -145,7 +140,10 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	if (opts.metricsTypes & securityMetrics) == securityMetrics {
 		security := mobile.SecurityMetrics{}
 		for i := 0; i < len(securityNames); i++ {
-			passed := boolGenerator.Bool()
+			passed := true
+			if opts.securityFailChance > 0.0 {
+				passed = rand.Float64() > opts.securityFailChance
+			}
 			securityMetric := mobile.SecurityMetric{
 				Id:     &securityIds[i],
 				Name:   &securityNames[i],
@@ -157,11 +155,11 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 
 		metricData.Security = &security
 	}
-	metric := new(mobile.Metric)
-	metric.ClientId = fixtures.clients[rand.Intn(opts.clients)]
-	metric.Data = metricData
 
-	return metric
+	return &mobile.Metric{
+		ClientId: fixtures.clients[rand.Intn(opts.clients)],
+		Data:     metricData,
+	}
 }
 
 func makeRandomSemvers(n int) []string {
@@ -178,24 +176,6 @@ func makeRandomStrings(n int, len int) []string {
 		arr[i] = RandStringBytesMaskImpr(len)
 	}
 	return arr
-}
-
-// from https://stackoverflow.com/questions/45030618/generate-a-random-bool-in-go
-type genCache struct {
-	cache     int64
-	remaining int
-}
-
-func (b *genCache) Bool() bool {
-	if b.remaining == 0 {
-		b.cache, b.remaining = rand.Int63(), 63
-	}
-
-	result := b.cache&0x01 == 1
-	b.cache >>= 1
-	b.remaining--
-
-	return result
 }
 
 // from https://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
