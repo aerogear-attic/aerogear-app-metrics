@@ -135,6 +135,15 @@ The `makefile` provided provides commands for building and testing the code. For
 
 * `make test-integration-cover` - Same as `make test-integration` but also generates a code coverage report. Used in the CI service.
 
+### Generating test data
+
+Use the `scripts/data-fill` script to generate random data targetting the same database as the main binary.
+By default it generates 15k records with some data variance. You can override these via cli flags:
+
+```
+go run scripts/data-fill.go -n=100 -apps=5
+```
+
 ## Environment Variables
 
 The aerogear-app-metrics server is configured using environment variables:
