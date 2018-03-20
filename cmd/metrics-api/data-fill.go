@@ -33,6 +33,13 @@ type SeedData struct {
 var platforms = []string{"android", "ios", "cordova"}
 
 var securityNames = []string{"DeveloperModeCheck", "EmulatorCheck", "DebuggerCheck", "RootedCheck", "ScreenLockCheck"}
+var securityIds = []string{
+	"org.aerogear.mobile.security.checks.DeveloperModeCheck",
+	"org.aerogear.mobile.security.checks.EmulatorCheck",
+	"org.aerogear.mobile.security.checks.DebuggerCheck",
+	"org.aerogear.mobile.security.checks.RootedCheck",
+	"org.aerogear.mobile.security.checks.ScreenLockCheck",
+}
 
 var boolGenerator = &genCache{}
 
@@ -119,7 +126,7 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 		securityIds[i] = "org.aerogear.mobile.security.checks." + securityNames[i]
 	}
 
-	metricData := new(mobile.MetricData)
+	metricData := &mobile.MetricData{}
 	if (opts.metricsTypes & appAndDeviceMetrics) == appAndDeviceMetrics {
 		metricData.App = &mobile.AppMetric{
 			ID:         fmt.Sprintf("app%d", rand.Intn(opts.apps)),
@@ -134,10 +141,9 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	if (opts.metricsTypes & securityMetrics) == securityMetrics {
 		security := mobile.SecurityMetrics{}
 		for i := 0; i < len(securityNames); i++ {
-			id := RandStringBytesMaskImpr(10)
 			passed := boolGenerator.Bool()
 			securityMetric := mobile.SecurityMetric{
-				Id:     &id,
+				Id:     &securityIds[i],
 				Name:   &securityNames[i],
 				Passed: &passed,
 			}
