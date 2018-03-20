@@ -9,6 +9,12 @@ services:
       POSTGRESQL_PASSWORD: postgres
       POSTGRESQL_USER: postgresql
       POSTGRESQL_DATABASE: aerogear_mobile_metrics
+  grafana:
+    image: grafana/grafana
+    environment:
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    ports:
+      - "3123:3000"
   api:
     build:
       context: .
