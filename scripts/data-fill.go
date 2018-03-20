@@ -1,3 +1,5 @@
+// CLI to seed random data to the database used by the metrics service
+// use the available flags to determine variance and amount of records to generate
 package main
 
 import (
@@ -52,7 +54,7 @@ const clientIdLen = 30
 const appIdLen = 20
 
 func main() {
-	n := *flag.Int("n", 15000, "Number of records to generate")
+	n := flag.Int("n", 15000, "Number of records to generate")
 
 	opts := &SeedOptions{}
 	flag.IntVar(&opts.apps, "apps", 3, "Number of different apps to generate")
@@ -66,7 +68,9 @@ func main() {
 	// TODO: make metrics types selectable or also random
 	opts.metricsTypes = appAndDeviceMetrics | securityMetrics
 
-	if n == 0 || opts.clients == 0 || opts.apps == 0 || opts.appVersions == 0 || opts.sdkVersions == 0 {
+	flag.Parse()
+
+	if *n == 0 || opts.clients == 0 || opts.apps == 0 || opts.appVersions == 0 || opts.sdkVersions == 0 {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
@@ -84,7 +88,7 @@ func main() {
 	}
 
 	service := initMetricsService()
-	for i := 0; i < n; i++ {
+	for i := 0; i < *n; i++ {
 		metric := generateMetrics(opts, seedData)
 		// TODO: add options to send metric via HTTP and print JSON to stdout
 		_, err := service.Create(*metric)
