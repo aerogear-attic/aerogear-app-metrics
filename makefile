@@ -25,10 +25,6 @@ setup:
 build: setup
 	go build -o $(BINARY) ./cmd/metrics-api/metrics-api.go
 
-.PHONY: build_datafill
-build_datafill: setup
-	go build -o datafill ./cmd/metrics-api/data-fill.go
-
 .PHONY: build_linux
 build_linux: setup
 	env GOOS=linux GOARCH=amd64 go build -o $(BINARY_LINUX_64) ./cmd/metrics-api/metrics-api.go
