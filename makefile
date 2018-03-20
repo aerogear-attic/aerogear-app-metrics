@@ -96,3 +96,7 @@ docker_push_release:
 docker_push_master:
 	@docker login -u $(DOCKERHUB_USERNAME) -p $(DOCKERHUB_PASSWORD)
 	docker push $(DOCKER_MASTER_TAG)
+
+.PHONY: generate
+generate:
+	go generate ./cmd/metrics-api/metrics-api.go
