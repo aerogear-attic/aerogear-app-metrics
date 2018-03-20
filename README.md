@@ -117,33 +117,6 @@ Password for user postgresql: # postgres
 aerogear_mobile_metrics=> select * from mobileappmetrics;
 ```
 
-### Using Swagger UI
-
-If you have the db & server running locally, you can generate and use a swagger spec as follows:
-
-```bash
-make generate
-```
-This should create a file `swagger.json` in the root of the project.
-Run the swagger UI via docker, mounting the root of the project
-
-```bash
-docker run -p 8080:8080 -e SWAGGER_JSON=/etc/swagger/swagger.json -v `pwd`:/etc/swagger swaggerapi/swagger-ui
-```
-
-Then visit http://localhost:8080 and you should see the Swagger UI.
-
-*How it works*
-
-* Operations are annotated in `router.go` e.g. metrics, healthz, ping
-  * These annotations define what the endpoint is, its method, expected content type, and the request body (via a $ref usually)
-* Models are annotated Go structs in `types.go`. The swagger spec generator reads the structs to generate the spec.
-
-*Known Issues*
-
-* The `timestamp` field is a `json.Number`. This gets generated as a `string` field in the swagger spec.
-* You may see caching issues in the browser when the swagger.json file changes (not sure why/when this happens). Clearing local storage in the browser (via developer tools) should fix it.
-
 ## Builds and Testing
 
 The `makefile` provided provides commands for building and testing the code. For now, only the most important commands are documented.
@@ -208,4 +181,37 @@ This will kick off an automated process in the CI service, where the following s
 
 The automated release process takes 2-3 minutes to complete on average.
 
-copyright AeroGear 2018.
+### Using Swagger UI
+
+A [Swagger](https://swagger.io/) UI can be used for testing the aerogear-app-metrics service. The go-swagger tools must be installed:
+
+```
+go get -u github.com/go-swagger/go-swagger/cmd/swagger
+```
+
+Then generate the Swagger spec as follows:
+
+```bash
+make generate
+```
+
+This creates `swagger.json` file in the root of the project.
+
+Run the Swagger UI using the official image. This mounts the root of the project as a volume.
+
+```bash
+docker run -p 8080:8080 -e SWAGGER_JSON=/etc/swagger/swagger.json -v `pwd`:/etc/swagger swaggerapi/swagger-ui
+```
+
+The Swagger UI is available at [localhost:8080](http://localhost:8080).
+
+**How it Works**
+
+* Operations are annotated in `router.go` e.g. metrics, healthz, ping
+  * These annotations define what the endpoint is, its method, expected content type, and the request body (via a $ref usually)
+* Models are annotated Go structs in `types.go`. The swagger spec generator reads the structs to generate the spec.
+
+**Known Issues**
+
+* The `timestamp` field is a `json.Number`. This gets generated as a `string` field in the swagger spec. (Technically this is not an issue because the `json.Number` type is *actually* a `string`.)
+* You may see caching issues in the browser when the swagger.json file changes (not sure why/when this happens). Clearing local storage in the browser (via developer tools) should fix it.
