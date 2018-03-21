@@ -274,3 +274,16 @@ The Swagger UI is available at [localhost:8080](http://localhost:8080).
 
 * The `timestamp` field is a `json.Number`. This gets generated as a `string` field in the swagger spec. (Technically this is not an issue because the `json.Number` type is *actually* a `string`.)
 * You may see caching issues in the browser when the swagger.json file changes (not sure why/when this happens). Clearing local storage in the browser (via developer tools) should fix it.
+
+## Contributing
+
+All contributions are hugely appreciated. Please see our [Contributing Guide](./Contributing.md) for guidelines on how to open issues and pull requests. Please check out our [Code of Conduct](./.github/CODE_OF_CONDUCT) too.
+
+## Any Questions?
+
+There are a number of ways you can get in in touch with us:
+
+* Open a Github issue.
+* Start a thread in the [Aerogear Mailing List](https://groups.google.com/forum/#!forum/aerogear) (Open to anyone).
+* Reach out to us on IRC. The Aerogear team can be found at the #Aerogear channel on [freenode.net](https://freenode.net/) (Open to anyone).
+
