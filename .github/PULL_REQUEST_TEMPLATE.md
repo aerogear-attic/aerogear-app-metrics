@@ -1,18 +1,21 @@
-## Motivation
-
-<!-- The reason underlying the contents of the PR, can be a link to the originating JIRA -->
-
-JIRA: https://issues.jboss.org/browse/AEROGEAR-{}
-
 ## Description
 
-<!-- The contents of the Pull Request, such as an overview of the changes implemented and impacted areas, additions, removals, etc. -->
+<!-- References to relevant tickets (if any) -->
+JIRA: https://issues.jboss.org/browse/AEROGEAR-{}
 
-## Progress
+<!-- Description of the changes you made, impacted components or areas, additions, removals, etc -->
 
-- [x] Done Task
-- [ ] Todo Task
+## Motivation
+
+<!-- Optional, explain the reason for this changes if they are not obvious -->
 
 ## Additional Notes
 
-<!-- Optional, extra context or instructions around the contents of this Pull Request -->
+<!-- Optional, extra context or instructions, e.g. steps for manual testing -->
+
+## Progress
+
+<!-- Optional -->
+
+- [x] Done Task
+- [ ] Todo Task
