@@ -80,9 +80,13 @@ This binary will be used to build the Docker image. Now start the entire applica
 docker-compose up
 ```
 
-### Example Client Request
+### Example Client Requests
 
-This section shows an example `curl` request which can be used to send some data to the `/metrics` endpoint.
+This section shows example `curl` requests which can be used to send some data to the `/metrics` endpoint.
+
+##### App and Device Related Metrics
+
+The following request corresponds to an app initialization event.
 
 ```
 curl -i -X POST \
@@ -104,6 +108,52 @@ curl -i -X POST \
     }
   }
 }'
+```
+
+##### Security Related Metrics
+
+The following request corresponds to on-device security check events.
+
+```
+curl -X POST \
+  http://localhost:3000/metrics \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 6db8f0ae-4e9e-1ae1-530b-138b1a87bfe7' \
+  -d '{
+  "clientId": "9796fb69-a566-43fb-b932-03951d82437f",
+  "timestamp": 1519989859342,
+  "data": {
+    "security": [
+      {
+        "type": "org.aerogear.mobile.security.checks.DeveloperModeCheck",
+        "name": "Developer Mode Check",
+        "passed": true
+      },
+     {
+        "type": "org.aerogear.mobile.security.checks.EmulatorCheck",
+        "name": "Emulator Check",
+        "passed": false
+      },
+      {
+        "type": "org.aerogear.mobile.security.checks.DebuggerCheck",
+        "name": "Debugger Check",
+        "passed": false
+      },
+      {
+        "type": "org.aerogear.mobile.security.checks.RootedCheck",
+        "name": "Rooted Check",
+        "passed": false
+      },
+      {
+        "type": "org.aerogear.mobile.security.checks.ScreenLockCheck",
+        "name": "Screen Lock Check",
+        "passed": false
+      }
+    ]
+  }
+}
+'
 ```
 
 You will see the data returned back in the response. 
