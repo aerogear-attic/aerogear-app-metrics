@@ -156,7 +156,7 @@ curl -X POST \
 '
 ```
 
-You will see the data returned back in the response. 
+Successful requests will return an empty 204 response.
 
 If you have the `psql` command line tools you can connect to the Database and verify the data was inserted.
 
