@@ -28,6 +28,7 @@ type SeedOptions struct {
 
 type SeedData struct {
 	clients          []string
+	clientsPlatforms map[string]string
 	appVersions      []string
 	sdkVersions      []string
 	platformVersions []string
@@ -83,12 +84,21 @@ func main() {
 	appVersions := makeRandomSemvers(opts.appVersions)
 	sdkVersions := makeRandomSemvers(opts.sdkVersions)
 	platformVersions := makeRandomSemvers(opts.platformVersions)
+	// associante a client with a specific platform
+	clientsPlatforms := make(map[string]string)
+	for _, client := range clients {
+		clientsPlatforms[client] = platforms[rand.Intn(len(platforms))]
+	}
+
 	seedData := &SeedData{
 		clients:          clients,
+		clientsPlatforms: clientsPlatforms,
 		appVersions:      appVersions,
 		sdkVersions:      sdkVersions,
 		platformVersions: platformVersions,
 	}
+
+	// generate
 
 	service := initMetricsService()
 	for i := 0; i < *n; i++ {
@@ -126,6 +136,8 @@ func initMetricsService() *mobile.MetricsService {
 
 func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	metricData := &mobile.MetricData{}
+	client := fixtures.clients[rand.Intn(opts.clients)]
+
 	if (opts.metricsTypes & appAndDeviceMetrics) == appAndDeviceMetrics {
 		metricData.App = &mobile.AppMetric{
 			ID:         fmt.Sprintf("app%d", rand.Intn(opts.apps)),
@@ -133,7 +145,7 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 			SDKVersion: fixtures.sdkVersions[rand.Intn(opts.sdkVersions)],
 		}
 		metricData.Device = &mobile.DeviceMetric{
-			Platform:        platforms[rand.Intn(len(platforms))],
+			Platform:        fixtures.clientsPlatforms[client],
 			PlatformVersion: fixtures.platformVersions[rand.Intn(opts.platformVersions)],
 		}
 	}
@@ -157,7 +169,7 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	}
 
 	return &mobile.Metric{
-		ClientId: fixtures.clients[rand.Intn(opts.clients)],
+		ClientId: client,
 		Data:     metricData,
 	}
 }
