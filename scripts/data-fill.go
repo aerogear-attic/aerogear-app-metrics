@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -41,6 +42,19 @@ type SeedData struct {
 
 type metricsHTTPService struct {
 	hostname string
+	client   *http.Client
+}
+
+func NewHTTPService(host string) *metricsHTTPService {
+	return &metricsHTTPService{
+		hostname: host,
+		// disable https check for openshift origin
+		client: &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		},
+	}
 }
 
 func (h *metricsHTTPService) Create(metric mobile.Metric) (mobile.Metric, error) {
@@ -48,7 +62,7 @@ func (h *metricsHTTPService) Create(metric mobile.Metric) (mobile.Metric, error)
 	if err := json.NewEncoder(byteBuffer).Encode(metric); err != nil {
 		return metric, err
 	}
-	res, err := http.Post(h.hostname+"/metrics", "application/json", byteBuffer)
+	res, err := h.client.Post(h.hostname+"/metrics", "application/json", byteBuffer)
 	if err != nil {
 		return metric, err
 	}
@@ -139,20 +153,14 @@ func main() {
 
 func getMetricsServiceImpl(opts *SeedOptions) web.MetricsServiceInterface {
 	if opts.httpTarget != "" {
-		return initHttpService(opts.httpTarget)
+		fmt.Printf("Utilizing http metrics creation targetting host %v\n", opts.httpTarget)
+		return NewHTTPService(opts.httpTarget)
 	}
+	fmt.Println("Targetting default postgresql instance")
 	return initMetricsService()
 }
 
-func initHttpService(host string) web.MetricsServiceInterface {
-	fmt.Printf("Utilizing http metrics creation targetting host %v\n", host)
-	return &metricsHTTPService{
-		hostname: host,
-	}
-}
-
 func initMetricsService() *mobile.MetricsService {
-	fmt.Println("Targetting default postgresql instance")
 	config := config.GetConfig()
 
 	dbHandler := dao.DatabaseHandler{}
