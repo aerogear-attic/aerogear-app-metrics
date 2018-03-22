@@ -3,16 +3,21 @@
 package main
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"math/rand"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/aerogear/aerogear-app-metrics/pkg/config"
 	"github.com/aerogear/aerogear-app-metrics/pkg/dao"
 	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+	"github.com/aerogear/aerogear-app-metrics/pkg/web"
 )
 
 type SeedOptions struct {
@@ -24,13 +29,47 @@ type SeedOptions struct {
 	platformVersions   int
 	metricsTypes       int
 	securityFailChance float64
+	httpTarget         string
 }
 
 type SeedData struct {
 	clients          []string
+	clientsPlatforms map[string]string
 	appVersions      []string
 	sdkVersions      []string
 	platformVersions []string
+}
+
+type metricsHTTPService struct {
+	hostname string
+	client   *http.Client
+}
+
+func NewHTTPService(host string) *metricsHTTPService {
+	return &metricsHTTPService{
+		hostname: host,
+		// disable https check for openshift origin
+		client: &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		},
+	}
+}
+
+func (h *metricsHTTPService) Create(metric mobile.Metric) (mobile.Metric, error) {
+	byteBuffer := new(bytes.Buffer)
+	if err := json.NewEncoder(byteBuffer).Encode(metric); err != nil {
+		return metric, err
+	}
+	res, err := h.client.Post(h.hostname+"/metrics", "application/json", byteBuffer)
+	if err != nil {
+		return metric, err
+	}
+	if res.StatusCode != 204 {
+		return metric, fmt.Errorf("Non OK status code %v", res.Status)
+	}
+	return metric, nil
 }
 
 var platforms = []string{"android", "ios", "cordova"}
@@ -63,6 +102,8 @@ func main() {
 	flag.IntVar(&opts.platformVersions, "platformVersions", 3, "Number of different platformVersions to generate")
 	flag.Float64Var(&opts.securityFailChance, "fail", 0.2, "Float chance of a security check failing randomly, use 0 to always pass")
 
+	flag.StringVar(&opts.httpTarget, "h", "", "address of a running server to target metrics generation via http. i.e. http://localhost:3000")
+
 	flag.Int64Var(&opts.seed, "seed", time.Now().UnixNano(), "Explicit seed value to use for replicable results, defaults to system time")
 
 	// TODO: make metrics types selectable or also random
@@ -83,14 +124,21 @@ func main() {
 	appVersions := makeRandomSemvers(opts.appVersions)
 	sdkVersions := makeRandomSemvers(opts.sdkVersions)
 	platformVersions := makeRandomSemvers(opts.platformVersions)
+	// associante a client with a specific platform
+	clientsPlatforms := make(map[string]string)
+	for _, client := range clients {
+		clientsPlatforms[client] = platforms[rand.Intn(len(platforms))]
+	}
+
 	seedData := &SeedData{
 		clients:          clients,
+		clientsPlatforms: clientsPlatforms,
 		appVersions:      appVersions,
 		sdkVersions:      sdkVersions,
 		platformVersions: platformVersions,
 	}
 
-	service := initMetricsService()
+	service := getMetricsServiceImpl(opts)
 	for i := 0; i < *n; i++ {
 		metric := generateMetrics(opts, seedData)
 		// TODO: add options to send metric via HTTP and print JSON to stdout
@@ -101,6 +149,15 @@ func main() {
 			fmt.Printf("Created record %d\n", i+1)
 		}
 	}
+}
+
+func getMetricsServiceImpl(opts *SeedOptions) web.MetricsServiceInterface {
+	if opts.httpTarget != "" {
+		fmt.Printf("Utilizing http metrics creation targetting host %v\n", opts.httpTarget)
+		return NewHTTPService(opts.httpTarget)
+	}
+	fmt.Println("Targetting default postgresql instance")
+	return initMetricsService()
 }
 
 func initMetricsService() *mobile.MetricsService {
@@ -126,6 +183,8 @@ func initMetricsService() *mobile.MetricsService {
 
 func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	metricData := &mobile.MetricData{}
+	client := fixtures.clients[rand.Intn(opts.clients)]
+
 	if (opts.metricsTypes & appAndDeviceMetrics) == appAndDeviceMetrics {
 		metricData.App = &mobile.AppMetric{
 			ID:         fmt.Sprintf("app%d", rand.Intn(opts.apps)),
@@ -133,7 +192,7 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 			SDKVersion: fixtures.sdkVersions[rand.Intn(opts.sdkVersions)],
 		}
 		metricData.Device = &mobile.DeviceMetric{
-			Platform:        platforms[rand.Intn(len(platforms))],
+			Platform:        fixtures.clientsPlatforms[client],
 			PlatformVersion: fixtures.platformVersions[rand.Intn(opts.platformVersions)],
 		}
 	}
@@ -157,7 +216,7 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	}
 
 	return &mobile.Metric{
-		ClientId: fixtures.clients[rand.Intn(opts.clients)],
+		ClientId: client,
 		Data:     metricData,
 	}
 }
