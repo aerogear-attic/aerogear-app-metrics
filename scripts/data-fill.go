@@ -93,10 +93,12 @@ const appIdLen = 20
 
 func main() {
 	n := flag.Int("n", 1000, "Number of records to generate")
+	nInit := flag.Int("nInit", 0, "Specify number of records of app+device type to be generated, overrides 'n'")
+	nSecurity := flag.Int("nSecurity", 0, "Specify number of records of security type to be generated, overrides 'n'")
 
 	opts := &SeedOptions{}
 	flag.IntVar(&opts.apps, "apps", 3, "Number of different apps to generate")
-	flag.IntVar(&opts.clients, "clients", 100, "Number of different clients to generate")
+	flag.IntVar(&opts.clients, "clients", 80, "Number of different clients to generate")
 	flag.IntVar(&opts.appVersions, "appVersions", 3, "Number of different appVersions to use")
 	flag.IntVar(&opts.sdkVersions, "sdkVersions", 3, "Number of different sdkVersions to generate")
 	flag.IntVar(&opts.platformVersions, "platformVersions", 3, "Number of different platformVersions to generate")
@@ -106,14 +108,16 @@ func main() {
 
 	flag.Int64Var(&opts.seed, "seed", time.Now().UnixNano(), "Explicit seed value to use for replicable results, defaults to system time")
 
-	// TODO: make metrics types selectable or also random
-	opts.metricsTypes = appAndDeviceMetrics | securityMetrics
-
 	flag.Parse()
 
-	if *n == 0 || opts.clients == 0 || opts.apps == 0 || opts.appVersions == 0 || opts.sdkVersions == 0 {
+	if opts.clients == 0 || opts.apps == 0 || opts.appVersions == 0 || opts.sdkVersions == 0 {
 		flag.PrintDefaults()
 		os.Exit(1)
+	}
+
+	if *n == 0 && *nInit == 0 && *nSecurity == 0 {
+		flag.PrintDefaults()
+		log.Fatal("must specify a number of records to generate")
 	}
 
 	seedValue := opts.seed
@@ -139,15 +143,32 @@ func main() {
 	}
 
 	service := getMetricsServiceImpl(opts)
-	for i := 0; i < *n; i++ {
-		metric := generateMetrics(opts, seedData)
-		// TODO: add options to send metric via HTTP and print JSON to stdout
-		_, err := service.Create(*metric)
-		if err != nil {
-			log.Printf("Error creating record %d: %v\n", i+1, err)
-		} else {
-			fmt.Printf("Created record %d\n", i+1)
+	if *nInit > 0 || *nSecurity > 0 {
+		opts.metricsTypes = appAndDeviceMetrics
+		for i := 0; i < *nInit; i++ {
+			createRandomMetric(i, service, opts, seedData)
 		}
+
+		opts.metricsTypes = securityMetrics
+		for i := 0; i < *nSecurity; i++ {
+			createRandomMetric(i, service, opts, seedData)
+		}
+	} else {
+		// generate all types of metrics data (-1 is 0x1111...)
+		opts.metricsTypes = -1
+		for i := 0; i < *n; i++ {
+			createRandomMetric(i, service, opts, seedData)
+		}
+	}
+}
+
+func createRandomMetric(i int, service web.MetricsServiceInterface, opts *SeedOptions, seedData *SeedData) {
+	metric := generateMetrics(opts, seedData)
+	_, err := service.Create(*metric)
+	if err != nil {
+		log.Printf("Error creating record %d: %v\n", i+1, err)
+	} else {
+		fmt.Printf("Created record %d\n", i+1)
 	}
 }
 
