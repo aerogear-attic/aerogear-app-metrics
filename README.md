@@ -188,11 +188,19 @@ The `makefile` provided provides commands for building and testing the code. For
 ### Generating test data
 
 Use the `scripts/data-fill` script to generate random data targetting the same database as the main binary.
-By default it generates 15k records with some data variance. You can override these via cli flags:
+By default it generates 1k records with some data variance. You can override these via cli flags:
 
 ```
 go run scripts/data-fill.go -n=100 -apps=5
 ```
+
+It is also possible to specify a given number of records of each metrics type to generate using the `n*` flags:
+
+```
+go run scripts/data-fill.go -nInit=100 -nSecurity=1000
+```
+
+The above will create 100 entries of records containing the `app` and `platform` keys inside `data`, followed by 1000 containing `security`.
 
 ## Environment Variables
 
