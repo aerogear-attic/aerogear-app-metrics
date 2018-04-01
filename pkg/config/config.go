@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type config struct {
+type Config struct {
 	DBConnectionString string
 	DBMaxConnections   int
 	ListenAddress      string
@@ -16,8 +16,8 @@ type config struct {
 	LogFormat          string
 }
 
-func GetConfig() config {
-	return config{
+func GetConfig() Config {
+	return Config{
 		DBConnectionString: getDBConnectionString(),
 		DBMaxConnections:   getEnvInt("DBMAX_CONNECTIONS", 100),
 		ListenAddress:      fmt.Sprintf(":%v", getEnvInt("PORT", 3000)),
