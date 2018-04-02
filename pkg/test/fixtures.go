@@ -2,22 +2,28 @@ package test
 
 import "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 
-func GetValidInitMetric() mobile.Metric {
+func GetEmptyDataMetric() mobile.Metric {
 	return mobile.Metric{
 		ClientTimestamp: "1234",
 		ClientId:        "client123",
-		Data: &mobile.MetricData{
-			App: &mobile.AppMetric{
-				ID:         "deadbeef",
-				SDKVersion: "1.2.3",
-				AppVersion: "27",
-			},
-			Device: &mobile.DeviceMetric{
-				Platform:        "android",
-				PlatformVersion: "19",
-			},
+		Data:            &mobile.MetricData{},
+	}
+}
+
+func GetValidInitMetric() mobile.Metric {
+	metric := GetEmptyDataMetric()
+	metric.Data = &mobile.MetricData{
+		App: &mobile.AppMetric{
+			ID:         "deadbeef",
+			SDKVersion: "1.2.3",
+			AppVersion: "27",
+		},
+		Device: &mobile.DeviceMetric{
+			Platform:        "android",
+			PlatformVersion: "19",
 		},
 	}
+	return metric
 }
 
 func GetNoAppInitMetric() mobile.Metric {

@@ -50,17 +50,22 @@ func TestMetricsEndpoint(t *testing.T) {
 		Payload  mobile.Metric
 	}{
 		{
+			Name:     "Metric with empty data should be invalid",
+			Expected: 400,
+			Payload:  GetEmptyDataMetric(),
+		},
+		{
 			Name:     "Valid Init Metric should be registered",
 			Expected: 204,
 			Payload:  GetValidInitMetric(),
 		},
 		{
-			Name:     "Init Metric without 'app' should error out",
+			Name:     "Init Metric without 'app' should be invalid",
 			Expected: 400,
 			Payload:  GetNoAppInitMetric(),
 		},
 		{
-			Name:     "Init Metric without 'device' should error out",
+			Name:     "Init Metric without 'device' should be invalid",
 			Expected: 400,
 			Payload:  GetNoDeviceInitMetric(),
 		},
@@ -70,17 +75,17 @@ func TestMetricsEndpoint(t *testing.T) {
 			Payload:  GetValidSecurityMetric(),
 		},
 		{
-			Name:     "Incomplete Security Metric should error out",
+			Name:     "Incomplete Security Metric should be invalid",
 			Expected: 400,
 			Payload:  GetIncompleteSecurityMetric(),
 		},
 		{
-			Name:     "Empty Security Metric should error out",
+			Name:     "Empty Security Metric should be invalid",
 			Expected: 400,
 			Payload:  GetEmptySecurityMetric(),
 		},
 		{
-			Name:     "Large clientIds should error out",
+			Name:     "Large clientIds should be invalid",
 			Expected: 400,
 			Payload:  GetLargeClientIdMetric(),
 		},
