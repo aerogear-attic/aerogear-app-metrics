@@ -54,10 +54,10 @@ func TestMetricValidate(t *testing.T) {
 			ExpectedReason: missingDataError,
 		},
 		{
-			Name:           "Metric with ClientId and Some Data should be valid",
+			Name:           "Metric with ClientId and only app data should be invalid",
 			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
-			Valid:          true,
-			ExpectedReason: "",
+			Valid:          false,
+			ExpectedReason: initMetricsIncompleteError,
 		},
 		{
 			Name:           "Metric with bad timestamp should be invalid",
@@ -67,7 +67,7 @@ func TestMetricValidate(t *testing.T) {
 		},
 		{
 			Name:           "Metric with valid timestamp should be valid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "12345", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "12345", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}, Device: &DeviceMetric{Platform: "android"}}},
 			Valid:          true,
 			ExpectedReason: "",
 		},
