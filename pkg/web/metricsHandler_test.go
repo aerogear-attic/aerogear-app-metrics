@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+	"github.com/aerogear/aerogear-app-metrics/pkg/test"
 	"github.com/stretchr/testify/assert"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -53,21 +54,8 @@ func postBuffer(t *testing.T, s *httptest.Server, buffer *bytes.Buffer) (res *ht
 }
 
 func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
-	metric := mobile.Metric{
-		ClientTimestamp: "1234",
-		ClientId:        "client123",
-		Data: &mobile.MetricData{
-			App: &mobile.AppMetric{
-				ID:         "deadbeef",
-				SDKVersion: "1.2.3",
-				AppVersion: "27",
-			},
-			Device: &mobile.DeviceMetric{
-				Platform:        "android",
-				PlatformVersion: "19",
-			},
-		},
-	}
+	metric := test.GetValidInitMetric()
+
 	mockMetricsService := new(MockMetricsService)
 	mockMetricsService.On("Create", metric).Return(metric, nil)
 	s := setupMetricsHandler(mockMetricsService)
@@ -81,21 +69,7 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 }
 
 func TestMetricsEndpointShouldReturn500WhenThereIsAnErrorInMetricsService(t *testing.T) {
-	metric := mobile.Metric{
-		ClientTimestamp: "1234",
-		ClientId:        "client123",
-		Data: &mobile.MetricData{
-			App: &mobile.AppMetric{
-				ID:         "deadbeef",
-				SDKVersion: "1.2.3",
-				AppVersion: "27",
-			},
-			Device: &mobile.DeviceMetric{
-				Platform:        "android",
-				PlatformVersion: "19",
-			},
-		},
-	}
+	metric := test.GetValidInitMetric()
 
 	mockMetricsService := new(MockMetricsService)
 	mockMetricsService.On("Create", metric).Return(mobile.Metric{}, errors.New("metrics service error")) // mock the service so that it returns an error
