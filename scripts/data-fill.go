@@ -84,8 +84,8 @@ var securityIds = []string{
 }
 
 const (
-	appAndDeviceMetrics = 1 << iota
-	securityMetrics     = 1 << iota
+	initMetrics     = 1 << iota
+	securityMetrics = 1 << iota
 )
 
 const clientIdLen = 30
@@ -144,12 +144,13 @@ func main() {
 
 	service := getMetricsServiceImpl(opts)
 	if *nInit > 0 || *nSecurity > 0 {
-		opts.metricsTypes = appAndDeviceMetrics
+		opts.metricsTypes = initMetrics
 		for i := 0; i < *nInit; i++ {
 			createRandomMetric(i, service, opts, seedData)
 		}
 
-		opts.metricsTypes = securityMetrics
+		// security metrics contain both init and security fields
+		opts.metricsTypes = initMetrics | securityMetrics
 		for i := 0; i < *nSecurity; i++ {
 			createRandomMetric(i, service, opts, seedData)
 		}
@@ -205,8 +206,9 @@ func initMetricsService() *mobile.MetricsService {
 func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	metricData := &mobile.MetricData{}
 	client := fixtures.clients[rand.Intn(opts.clients)]
+	var eventType = "init"
 
-	if (opts.metricsTypes & appAndDeviceMetrics) == appAndDeviceMetrics {
+	if (opts.metricsTypes & initMetrics) == initMetrics {
 		metricData.App = &mobile.AppMetric{
 			ID:         fmt.Sprintf("app%d", rand.Intn(opts.apps)),
 			AppVersion: fixtures.appVersions[rand.Intn(opts.appVersions)],
@@ -218,6 +220,7 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 		}
 	}
 	if (opts.metricsTypes & securityMetrics) == securityMetrics {
+		eventType = "security"
 		security := mobile.SecurityMetrics{}
 		for i := 0; i < len(securityNames); i++ {
 			passed := true
@@ -237,8 +240,9 @@ func generateMetrics(opts *SeedOptions, fixtures *SeedData) *mobile.Metric {
 	}
 
 	return &mobile.Metric{
-		ClientId: client,
-		Data:     metricData,
+		EventType: eventType,
+		ClientId:  client,
+		Data:      metricData,
 	}
 }
 
