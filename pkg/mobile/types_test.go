@@ -19,31 +19,31 @@ func TestMetricValidate(t *testing.T) {
 			Name:           "Empty metric should be invalid",
 			MetricBuilder:  test.GetEmptyMetric,
 			Valid:          false,
-			ExpectedReason: mobile.missingClientIdError,
+			ExpectedReason: mobile.MissingClientIdError,
 		},
 		{
 			Name:           "Metric with no clientId should be invalid",
 			MetricBuilder:  test.GetNoClientIdMetric,
 			Valid:          false,
-			ExpectedReason: mobile.missingClientIdError,
+			ExpectedReason: mobile.MissingClientIdError,
 		},
 		{
 			Name:           "Metric with long clientId should be invalid",
 			MetricBuilder:  test.GetLargeClientIdMetric,
 			Valid:          false,
-			ExpectedReason: mobile.clientIdLengthError,
+			ExpectedReason: mobile.ClientIdLengthError,
 		},
 		{
 			Name:           "Metric with no Data should be invalid",
 			MetricBuilder:  test.GetNoDataMetric,
 			Valid:          false,
-			ExpectedReason: mobile.missingDataError,
+			ExpectedReason: mobile.MissingDataError,
 		},
 		{
 			Name:           "Metric with empty Data should be invalid",
 			MetricBuilder:  test.GetEmptyDataMetric,
 			Valid:          false,
-			ExpectedReason: mobile.missingDataError,
+			ExpectedReason: mobile.MissingDataError,
 		},
 		{
 			Name:           "Metric with ClientId and Some Data should be valid",
@@ -55,7 +55,7 @@ func TestMetricValidate(t *testing.T) {
 			Name:           "Metric with bad timestamp should be invalid",
 			MetricBuilder:  test.GetMetricWithInvalidTimestamp,
 			Valid:          false,
-			ExpectedReason: mobile.invalidTimestampError,
+			ExpectedReason: mobile.InvalidTimestampError,
 		},
 		{
 			Name:           "Metric with valid timestamp should be valid",
@@ -64,54 +64,40 @@ func TestMetricValidate(t *testing.T) {
 			ExpectedReason: "",
 		},
 		{
-			Name: "Security Metrics with missing id field should be invalid",
-			MetricBuilder: func() Metric {
-				m := test.GetIncompleteSecurityMetric()
-				m.Data.Security[0].Passed = true
-				m.Data.Security[0].Name = "test"
-				return m
-			},
+			Name:           "Security Metrics with missing id field should be invalid",
+			MetricBuilder:  test.GetNoIdSecurityMetric,
 			Valid:          false,
-			ExpectedReason: fmt.Sprintf(securityMetricMissingIdError, 0),
+			ExpectedReason: fmt.Sprintf(mobile.SecurityMetricMissingIdError, 0),
 		},
 		{
-			Name: "Security Metrics with missing name field should be invalid",
-			MetricBuilder: func() Metric {
-				m := test.GetIncompleteSecurityMetric()
-				m.Data.Security[0].Id = "testId"
-				m.Data.Security[0].Passed = true
-				return m
-			},
+			Name:           "Security Metrics with missing name field should be invalid",
+			MetricBuilder:  test.GetNoNameSecurityMetric,
 			Valid:          false,
-			ExpectedReason: fmt.Sprintf(securityMetricMissingNameError, 0),
+			ExpectedReason: fmt.Sprintf(mobile.SecurityMetricMissingNameError, 0),
 		},
 		{
-			Name: "Security Metrics with missing passed field should be invalid",
-			MetricBuilder: func() Metric {
-				m := test.GetIncompleteSecurityMetric()
-				m.Data.Security[0].Id = "testId"
-				m.Data.Security[0].Name = "test"
-				return m
-			},
+			Name:           "Security Metrics with missing passed field should be invalid",
+			MetricBuilder:  test.GetNoPassedSecurityMetric,
 			Valid:          false,
-			ExpectedReason: fmt.Sprintf(securityMetricMissingPassedError, 0),
+			ExpectedReason: fmt.Sprintf(mobile.SecurityMetricMissingPassedError, 0),
 		},
 		{
 			Name:           "Empty Security Metrics slice should be invalid",
 			MetricBuilder:  test.GetEmptySecurityMetric,
 			Valid:          false,
-			ExpectedReason: mobile.securityMetricsEmptyError,
+			ExpectedReason: mobile.SecurityMetricsEmptyError,
 		},
 		{
 			Name:           "Security Metrics slice with length > max length should be valid",
 			MetricBuilder:  test.GetOverfilledSecurityMetric,
 			Valid:          false,
-			ExpectedReason: mobile.securityMetricsLengthError,
+			ExpectedReason: mobile.SecurityMetricsLengthError,
 		},
 	}
 
 	for _, tc := range testCases {
-		valid, reason := tc.Metric.Validate()
+		metric := tc.MetricBuilder()
+		valid, reason := metric.Validate()
 
 		if valid != tc.Valid {
 			t.Errorf("case failed: %s. Expected: %v, got %v", tc.Name, tc.Valid, valid)

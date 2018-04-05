@@ -2,11 +2,16 @@ package test
 
 import "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 
+var securityMetricId = "org.aerogear.mobile.security.checks.TestCheck"
+var securityMetricName = "TestCheck"
+var securityMetricPassed = true
+
 func GetEmptyMetric() mobile.Metric {
 	return mobile.Metric{}
 }
 func GetNoDataMetric() mobile.Metric {
 	return mobile.Metric{
+		EventType:       "init",
 		ClientTimestamp: "1234",
 		ClientId:        "client123",
 	}
@@ -26,6 +31,7 @@ func GetNoClientIdMetric() mobile.Metric {
 
 func GetValidInitMetric() mobile.Metric {
 	m := GetEmptyDataMetric()
+	m.EventType = "init"
 	m.Data = &mobile.MetricData{
 		App: &mobile.AppMetric{
 			ID:         "deadbeef",
@@ -73,7 +79,7 @@ func GetMetricWithInvalidTimestamp() mobile.Metric {
 }
 
 func GetValidSecurityMetric() mobile.Metric {
-	m := GetValidInitMetric()
+	m := GetEmptySecurityMetric()
 	security := mobile.SecurityMetrics{}
 	id := "org.aerogear.mobile.security.checks.DeveloperModeCheck"
 	name := "DeveloperModeCheck"
@@ -88,24 +94,53 @@ func GetValidSecurityMetric() mobile.Metric {
 }
 
 func GetIncompleteSecurityMetric() mobile.Metric {
-	m := GetValidInitMetric()
+	m := GetEmptySecurityMetric()
 	security := mobile.SecurityMetrics{}
 	security = append(security, mobile.SecurityMetric{})
 	m.Data.Security = &security
 	return m
 }
 
+func GetNoIdSecurityMetric() mobile.Metric {
+	m := GetEmptySecurityMetric()
+	security := mobile.SecurityMetrics{}
+	security = append(security, mobile.SecurityMetric{
+		Name:   &securityMetricName,
+		Passed: &securityMetricPassed,
+	})
+	m.Data.Security = &security
+	return m
+}
+
+func GetNoPassedSecurityMetric() mobile.Metric {
+	m := GetEmptySecurityMetric()
+	security := mobile.SecurityMetrics{}
+	security = append(security, mobile.SecurityMetric{
+		Id:   &securityMetricId,
+		Name: &securityMetricName,
+	})
+	m.Data.Security = &security
+	return m
+}
+func GetNoNameSecurityMetric() mobile.Metric {
+	m := GetEmptySecurityMetric()
+	security := mobile.SecurityMetrics{}
+	security = append(security, mobile.SecurityMetric{
+		Id:     &securityMetricId,
+		Passed: &securityMetricPassed,
+	})
+	m.Data.Security = &security
+	return m
+}
+
 func GetEmptySecurityMetric() mobile.Metric {
 	m := GetValidInitMetric()
+	m.EventType = "security"
 	m.Data.Security = &mobile.SecurityMetrics{}
 	return m
 }
 
 func GetOverfilledSecurityMetric() mobile.Metric {
-	securityMetricId := "org.aerogear.mobile.security.checks.TestCheck"
-	securityMetricName := "TestCheck"
-	securityMetricPassed := true
-
 	bigSecurityMetricList := mobile.SecurityMetrics{}
 	for i := 0; i <= 129; i++ {
 		bigSecurityMetricList = append(bigSecurityMetricList, mobile.SecurityMetric{
