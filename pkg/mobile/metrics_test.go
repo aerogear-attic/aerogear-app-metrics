@@ -14,8 +14,8 @@ type MetricsDAOMock struct {
 	mock.Mock
 }
 
-func (m *MetricsDAOMock) Create(clientId string, metricsData []byte, clientTime *time.Time) error {
-	args := m.Called(clientId, metricsData, clientTime)
+func (m *MetricsDAOMock) Create(clientId string, eventType string, metricsData []byte, clientTime *time.Time) error {
+	args := m.Called(clientId, eventType, metricsData, clientTime)
 	return args.Error(0)
 }
 
@@ -28,9 +28,10 @@ func newTestMetricsService() (*MetricsDAOMock, *MetricsService) {
 }
 
 func TestCreateCallsDAOWithCorrectArgs(t *testing.T) {
-
+	eventType := "init"
 	metric := Metric{
-		ClientId: "org.aerogear.metrics.tests",
+		ClientId:  "org.aerogear.metrics.tests",
+		EventType: eventType,
 		Data: &MetricData{
 			App: &AppMetric{
 				ID:         "12345678",
@@ -51,7 +52,7 @@ func TestCreateCallsDAOWithCorrectArgs(t *testing.T) {
 
 	mdaoMock, ms := newTestMetricsService()
 
-	mdaoMock.On("Create", metric.ClientId, expectedMetricsData, (*time.Time)(nil)).Return(nil)
+	mdaoMock.On("Create", metric.ClientId, eventType, expectedMetricsData, (*time.Time)(nil)).Return(nil)
 
 	res, err := ms.Create(metric)
 
@@ -67,9 +68,10 @@ func TestCreateCallsDAOWithCorrectArgs(t *testing.T) {
 }
 
 func TestCreateReturnsErrorFromDAO(t *testing.T) {
-
+	eventType := "init"
 	metric := Metric{
-		ClientId: "org.aerogear.metrics.tests",
+		ClientId:  "org.aerogear.metrics.tests",
+		EventType: eventType,
 		Data: &MetricData{
 			App: &AppMetric{
 				ID:         "12345678",
@@ -91,7 +93,7 @@ func TestCreateReturnsErrorFromDAO(t *testing.T) {
 	mdaoMock, ms := newTestMetricsService()
 
 	daoError := errors.New("problem connecting to db")
-	mdaoMock.On("Create", metric.ClientId, expectedMetricsData, (*time.Time)(nil)).Return(daoError)
+	mdaoMock.On("Create", metric.ClientId, eventType, expectedMetricsData, (*time.Time)(nil)).Return(daoError)
 
 	_, err = ms.Create(metric)
 
@@ -103,9 +105,10 @@ func TestCreateReturnsErrorFromDAO(t *testing.T) {
 }
 
 func TestCreateCallsDaoWithCorrectTimestamp(t *testing.T) {
-
+	eventType := "init"
 	metric := Metric{
 		ClientId:        "org.aerogear.metrics.tests",
+		EventType:       eventType,
 		ClientTimestamp: "12345",
 		Data: &MetricData{
 			App: &AppMetric{
@@ -128,7 +131,7 @@ func TestCreateCallsDaoWithCorrectTimestamp(t *testing.T) {
 
 	mdaoMock, ms := newTestMetricsService()
 
-	mdaoMock.On("Create", metric.ClientId, expectedMetricsData, &expectedTimestamp).Return(nil)
+	mdaoMock.On("Create", metric.ClientId, eventType, expectedMetricsData, &expectedTimestamp).Return(nil)
 	res, err := ms.Create(metric)
 
 	if err != nil {
