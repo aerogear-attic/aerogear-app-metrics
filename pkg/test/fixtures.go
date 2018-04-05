@@ -2,17 +2,31 @@ package test
 
 import "github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 
-func GetEmptyDataMetric() mobile.Metric {
+func GetEmptyMetric() mobile.Metric {
+	return mobile.Metric{}
+}
+func GetNoDataMetric() mobile.Metric {
 	return mobile.Metric{
 		ClientTimestamp: "1234",
 		ClientId:        "client123",
-		Data:            &mobile.MetricData{},
 	}
 }
 
+func GetEmptyDataMetric() mobile.Metric {
+	m := GetNoDataMetric()
+	m.Data = &mobile.MetricData{}
+	return m
+}
+
+func GetNoClientIdMetric() mobile.Metric {
+	m := GetEmptyDataMetric()
+	m.ClientId = ""
+	return m
+}
+
 func GetValidInitMetric() mobile.Metric {
-	metric := GetEmptyDataMetric()
-	metric.Data = &mobile.MetricData{
+	m := GetEmptyDataMetric()
+	m.Data = &mobile.MetricData{
 		App: &mobile.AppMetric{
 			ID:         "deadbeef",
 			SDKVersion: "1.2.3",
@@ -23,36 +37,43 @@ func GetValidInitMetric() mobile.Metric {
 			PlatformVersion: "19",
 		},
 	}
-	return metric
+	return m
 }
 
 func GetNoAppInitMetric() mobile.Metric {
-	metric := GetValidInitMetric()
-	metric.Data.App = nil
-	return metric
+	m := GetValidInitMetric()
+	m.Data.App = nil
+	return m
 }
 
 func GetNoDeviceInitMetric() mobile.Metric {
-	metric := GetValidInitMetric()
-	metric.Data.Device = nil
-	return metric
+	m := GetValidInitMetric()
+	m.Data.Device = nil
+	return m
 }
 
 func GetLargeClientIdMetric() mobile.Metric {
-	metric := GetValidInitMetric()
-	metric.ClientId = "453de743211112345678900987654312345678908776423567890876543678907654356789076543536789765436789076543256789076543256789654321456789654321456789765432567869765432567896543256789765432145678976543214567897654324567896543214567897654321245678976543256789765432145678965432567896543256786543214567865432"
-	return metric
+	m := GetValidInitMetric()
+	m.ClientId = "453de743211112345678900987654312345678908776423567890876543678907654356789076543536789765436789076543256789076543256789654321456789654321456789765432567869765432567896543256789765432145678976543214567897654324567896543214567897654321245678976543256789765432145678965432567896543256786543214567865432"
+	return m
 }
 
 func GetMetricWithTimestamp() mobile.Metric {
-	metric := GetValidInitMetric()
-	metric.ClientId = "withTimestamp"
-	metric.ClientTimestamp = "123456789"
-	return metric
+	m := GetValidInitMetric()
+	m.ClientId = "withTimestamp"
+	m.ClientTimestamp = "123456789"
+	return m
+}
+
+func GetMetricWithInvalidTimestamp() mobile.Metric {
+	m := GetValidInitMetric()
+	m.ClientId = "withInvalidTimestamp"
+	m.ClientTimestamp = "invalid"
+	return m
 }
 
 func GetValidSecurityMetric() mobile.Metric {
-	metric := GetValidInitMetric()
+	m := GetValidInitMetric()
 	security := mobile.SecurityMetrics{}
 	id := "org.aerogear.mobile.security.checks.DeveloperModeCheck"
 	name := "DeveloperModeCheck"
@@ -62,23 +83,38 @@ func GetValidSecurityMetric() mobile.Metric {
 		Name:   &name,
 		Passed: &passed,
 	})
-	metric.Data.Security = &security
-	return metric
+	m.Data.Security = &security
+	return m
 }
 
 func GetIncompleteSecurityMetric() mobile.Metric {
-	metric := GetValidInitMetric()
+	m := GetValidInitMetric()
 	security := mobile.SecurityMetrics{}
-	passed := true
-	security = append(security, mobile.SecurityMetric{
-		Passed: &passed,
-	})
-	metric.Data.Security = &security
-	return metric
+	security = append(security, mobile.SecurityMetric{})
+	m.Data.Security = &security
+	return m
 }
 
 func GetEmptySecurityMetric() mobile.Metric {
-	metric := GetValidInitMetric()
-	metric.Data.Security = &mobile.SecurityMetrics{}
-	return metric
+	m := GetValidInitMetric()
+	m.Data.Security = &mobile.SecurityMetrics{}
+	return m
+}
+
+func GetOverfilledSecurityMetric() mobile.Metric {
+	securityMetricId := "org.aerogear.mobile.security.checks.TestCheck"
+	securityMetricName := "TestCheck"
+	securityMetricPassed := true
+
+	bigSecurityMetricList := mobile.SecurityMetrics{}
+	for i := 0; i <= 129; i++ {
+		bigSecurityMetricList = append(bigSecurityMetricList, mobile.SecurityMetric{
+			Id:     &securityMetricId,
+			Name:   &securityMetricName,
+			Passed: &securityMetricPassed,
+		})
+	}
+	m := GetEmptySecurityMetric()
+	m.Data.Security = &bigSecurityMetricList
+	return m
 }
