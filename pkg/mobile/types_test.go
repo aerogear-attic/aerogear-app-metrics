@@ -64,6 +64,12 @@ func TestMetricValidate(t *testing.T) {
 			ExpectedReason: "",
 		},
 		{
+			Name:           "Filled Security Metrics should be valid",
+			MetricBuilder:  test.GetValidSecurityMetric,
+			Valid:          true,
+			ExpectedReason: "",
+		},
+		{
 			Name:           "Security Metrics with missing id field should be invalid",
 			MetricBuilder:  test.GetNoIdSecurityMetric,
 			Valid:          false,
@@ -92,6 +98,16 @@ func TestMetricValidate(t *testing.T) {
 			MetricBuilder:  test.GetOverfilledSecurityMetric,
 			Valid:          false,
 			ExpectedReason: mobile.SecurityMetricsLengthError,
+		},
+		{
+			Name: "Metrics with invalid event_type should be invalid",
+			MetricBuilder: func() mobile.Metric {
+				m := test.GetValidInitMetric()
+				m.EventType = "dunno"
+				return m
+			},
+			Valid:          false,
+			ExpectedReason: mobile.UnknownTypeError,
 		},
 	}
 
