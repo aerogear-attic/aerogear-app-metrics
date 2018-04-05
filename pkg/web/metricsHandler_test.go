@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+	"github.com/aerogear/aerogear-app-metrics/pkg/test"
 	"github.com/stretchr/testify/assert"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -31,77 +32,52 @@ func setupMetricsHandler(service MetricsServiceInterface) *httptest.Server {
 	return httptest.NewServer(router)
 }
 
-func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
-	metric := mobile.Metric{
-		ClientTimestamp: "1234",
-		ClientId:        "client123",
-		Data: &mobile.MetricData{
-			App: &mobile.AppMetric{
-				ID:         "deadbeef",
-				SDKVersion: "1.2.3",
-				AppVersion: "27",
-			},
-			Device: &mobile.DeviceMetric{
-				Platform:        "android",
-				PlatformVersion: "19",
-			},
-		},
-	}
-
-	byteBuffer := new(bytes.Buffer)
-	err := json.NewEncoder(byteBuffer).Encode(metric)
+func postMetric(t *testing.T, s *httptest.Server, metric *mobile.Metric) (*http.Response, error) {
+	var buffer *bytes.Buffer
+	buffer = new(bytes.Buffer)
+	err := json.NewEncoder(buffer).Encode(metric)
 	assert.Nil(t, err, "did not expect an error marshaling metric")
+
+	return postBuffer(t, s, buffer)
+}
+
+func postBuffer(t *testing.T, s *httptest.Server, buffer *bytes.Buffer) (res *http.Response, err error) {
+	if buffer != nil {
+		res, err = http.Post(s.URL+"/metrics", "application/json", buffer)
+	} else {
+		res, err = http.Post(s.URL+"/metrics", "application/json", nil)
+	}
+	assert.Nil(t, err, "did not expect an error posting metrics")
+	_, err = ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
+	assert.Nil(t, err, "did not expect an error reading the response body")
+	return res, err
+}
+
+func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
+	metric := test.GetValidInitMetric()
 
 	mockMetricsService := new(MockMetricsService)
 	mockMetricsService.On("Create", metric).Return(metric, nil)
-
 	s := setupMetricsHandler(mockMetricsService)
 	defer s.Close()
 
-	res, err := http.Post(s.URL+"/metrics", "application/json", byteBuffer)
-	assert.Nil(t, err, "did not expect an error posting metrics")
-
-	defer res.Body.Close()
-	_, err = ioutil.ReadAll(res.Body)
-
+	res, _ := postMetric(t, s, &metric)
 	assert.Equal(t, 204, res.StatusCode)
 
 	mockMetricsService.AssertExpectations(t)
 }
 
 func TestMetricsEndpointShouldReturn500WhenThereIsAnErrorInMetricsService(t *testing.T) {
-	metric := mobile.Metric{
-		ClientTimestamp: "1234",
-		ClientId:        "client123",
-		Data: &mobile.MetricData{
-			App: &mobile.AppMetric{
-				ID:         "deadbeef",
-				SDKVersion: "1.2.3",
-				AppVersion: "27",
-			},
-			Device: &mobile.DeviceMetric{
-				Platform:        "android",
-				PlatformVersion: "19",
-			},
-		},
-	}
-
-	byteBuffer := new(bytes.Buffer)
-	err := json.NewEncoder(byteBuffer).Encode(metric)
-	assert.Nil(t, err, "did not expect an error marshaling metric")
+	metric := test.GetValidInitMetric()
 
 	mockMetricsService := new(MockMetricsService)
-	mockMetricsService.On("Create", metric).Return(mobile.Metric{}, errors.New("Metrics service error!")) // mock the service so that it returns an error
+	mockMetricsService.On("Create", metric).Return(mobile.Metric{}, errors.New("metrics service error")) // mock the service so that it returns an error
 
 	s := setupMetricsHandler(mockMetricsService)
 	defer s.Close()
 
-	res, err := http.Post(s.URL+"/metrics", "application/json", byteBuffer)
-	assert.Nil(t, err, "did not expect an error posting metrics")
-
-	defer res.Body.Close()
-	_, err = ioutil.ReadAll(res.Body)
-
+	res, _ := postMetric(t, s, &metric)
 	assert.Equal(t, 500, res.StatusCode)
 
 	mockMetricsService.AssertExpectations(t)
@@ -113,11 +89,7 @@ func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsEmpt
 	s := setupMetricsHandler(mockMetricsService)
 	defer s.Close()
 
-	res, err := http.Post(s.URL+"/metrics", "application/json", nil) // empty request body
-	assert.Nil(t, err, "did not expect an error posting metrics")
-
-	defer res.Body.Close()
-	_, err = ioutil.ReadAll(res.Body)
+	res, _ := postBuffer(t, s, nil)
 
 	assert.Equal(t, 400, res.StatusCode)
 
@@ -133,11 +105,7 @@ func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsInva
 	byteBuffer := new(bytes.Buffer)
 	byteBuffer.WriteString("nonsense") // invalid JSON
 
-	res, err := http.Post(s.URL+"/metrics", "application/json", byteBuffer)
-	assert.Nil(t, err, "did not expect an error posting metrics")
-
-	defer res.Body.Close()
-	_, err = ioutil.ReadAll(res.Body)
+	res, _ := postBuffer(t, s, byteBuffer)
 
 	assert.Equal(t, 400, res.StatusCode)
 

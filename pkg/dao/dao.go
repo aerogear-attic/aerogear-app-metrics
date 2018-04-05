@@ -23,6 +23,11 @@ func (m *MetricsDAO) IsHealthy() error {
 	return err
 }
 
+// Closes the underlying db instance
+func (m *MetricsDAO) Close() error {
+	return m.db.Close()
+}
+
 func NewMetricsDAO(db *sql.DB) *MetricsDAO {
 	return &MetricsDAO{
 		db: db,

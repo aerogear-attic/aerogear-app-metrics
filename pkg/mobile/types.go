@@ -78,6 +78,7 @@ const securityMetricsMaxLength = 30
 const missingClientIdError = "missing clientId in payload"
 const invalidTimestampError = "timestamp must be a valid number"
 const missingDataError = "missing metrics data in payload"
+const initMetricsIncompleteError = "data.app and data.security must both be present simultaneously"
 const securityMetricsEmptyError = "data.security cannot be empty"
 const securityMetricMissingIdError = "invalid element in data.security at position %v, id must be included"
 const securityMetricMissingNameError = "invalid element in data.security at position %v, name must be included"
@@ -104,6 +105,10 @@ func (m *Metric) Validate() (valid bool, reason string) {
 	// check if data field was missing or empty object
 	if m.Data == nil || (MetricData{}) == *m.Data {
 		return false, missingDataError
+	}
+
+	if (m.Data.Device != nil && m.Data.App == nil) || (m.Data.Device == nil && m.Data.App != nil) {
+		return false, initMetricsIncompleteError
 	}
 
 	if m.Data.Security != nil {

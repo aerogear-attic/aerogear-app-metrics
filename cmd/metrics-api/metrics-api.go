@@ -20,47 +20,19 @@ package main
 import (
 	"net/http"
 
+	"github.com/aerogear/aerogear-app-metrics/internal/setup"
 	"github.com/aerogear/aerogear-app-metrics/pkg/config"
-	"github.com/aerogear/aerogear-app-metrics/pkg/dao"
-	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
-	"github.com/aerogear/aerogear-app-metrics/pkg/web"
 	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-
 	config := config.GetConfig()
+	metricsDao := setup.InitDao(config.DBConnectionString, config.DBMaxConnections)
+	defer metricsDao.Close()
+	router := setup.InitRouter(metricsDao)
 
 	initLogger(config.LogLevel, config.LogFormat)
-
-	dbHandler := dao.DatabaseHandler{}
-
-	err := dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
-
-	if err != nil {
-		panic("failed to connect to sql database : " + err.Error())
-	}
-	defer dbHandler.DB.Close()
-
-	if err := dbHandler.DoInitialSetup(); err != nil {
-		panic("failed to perform database setup : " + err.Error())
-	}
-
-	metricsDao := dao.NewMetricsDAO(dbHandler.DB)
-	router := web.NewRouter()
-
-	//metrics route
-	{
-		metricsService := mobile.NewMetricsService(metricsDao)
-		metricsHandler := web.NewMetricsHandler(metricsService)
-		web.MetricsRoute(router, metricsHandler)
-	}
-	//health route
-	{
-		healthHandler := web.NewHealthHandler(metricsDao)
-		web.HealthzRoute(router, healthHandler)
-	}
 
 	log.WithFields(log.Fields{"listenAddress": config.ListenAddress}).Info("Starting application")
 
