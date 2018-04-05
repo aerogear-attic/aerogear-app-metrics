@@ -49,6 +49,7 @@ func postBuffer(t *testing.T, s *httptest.Server, buffer *bytes.Buffer) (res *ht
 	}
 	assert.Nil(t, err, "did not expect an error posting metrics")
 	_, err = ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
 	assert.Nil(t, err, "did not expect an error reading the response body")
 	return res, err
 }
@@ -62,7 +63,6 @@ func TestMetricsEndpointShouldPassReceivedDataToMetricsService(t *testing.T) {
 	defer s.Close()
 
 	res, _ := postMetric(t, s, &metric)
-	defer res.Body.Close()
 	assert.Equal(t, 204, res.StatusCode)
 
 	mockMetricsService.AssertExpectations(t)
@@ -78,7 +78,6 @@ func TestMetricsEndpointShouldReturn500WhenThereIsAnErrorInMetricsService(t *tes
 	defer s.Close()
 
 	res, _ := postMetric(t, s, &metric)
-	defer res.Body.Close()
 	assert.Equal(t, 500, res.StatusCode)
 
 	mockMetricsService.AssertExpectations(t)
@@ -91,7 +90,6 @@ func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsEmpt
 	defer s.Close()
 
 	res, _ := postBuffer(t, s, nil)
-	defer res.Body.Close()
 
 	assert.Equal(t, 400, res.StatusCode)
 
@@ -108,7 +106,6 @@ func TestMetricsEndpointShouldNotInteractWithMetricsServiceWhenRequestBodyIsInva
 	byteBuffer.WriteString("nonsense") // invalid JSON
 
 	res, _ := postBuffer(t, s, byteBuffer)
-	defer res.Body.Close()
 
 	assert.Equal(t, 400, res.StatusCode)
 

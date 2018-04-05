@@ -1,7 +1,6 @@
 package setup
 
 import (
-	"github.com/aerogear/aerogear-app-metrics/pkg/config"
 	"github.com/aerogear/aerogear-app-metrics/pkg/dao"
 	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
 	"github.com/aerogear/aerogear-app-metrics/pkg/web"
@@ -25,11 +24,11 @@ func InitRouter(metricsDao *dao.MetricsDAO) *mux.Router {
 	return router
 }
 
-func InitDao(config config.Config) *dao.MetricsDAO {
+func InitDao(connString string, connections int) *dao.MetricsDAO {
 
 	dbHandler := dao.DatabaseHandler{}
 
-	err := dbHandler.Connect(config.DBConnectionString, config.DBMaxConnections)
+	err := dbHandler.Connect(connString, connections)
 
 	if err != nil {
 		panic("failed to connect to sql database : " + err.Error())

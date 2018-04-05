@@ -17,7 +17,7 @@ import (
 
 func setupTestServer() *httptest.Server {
 	config := config.GetConfig()
-	metricsDao := setup.InitDao(config)
+	metricsDao := setup.InitDao(config.DBConnectionString, config.DBMaxConnections)
 	router := setup.InitRouter(metricsDao)
 
 	return httptest.NewServer(router)

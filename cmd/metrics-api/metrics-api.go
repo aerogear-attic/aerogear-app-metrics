@@ -28,7 +28,8 @@ import (
 
 func main() {
 	config := config.GetConfig()
-	metricsDao := setup.InitDao(config)
+	metricsDao := setup.InitDao(config.DBConnectionString, config.DBMaxConnections)
+	defer metricsDao.Close()
 	router := setup.InitRouter(metricsDao)
 
 	initLogger(config.LogLevel, config.LogFormat)
