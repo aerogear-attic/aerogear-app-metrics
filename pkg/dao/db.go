@@ -58,7 +58,7 @@ func (handler *DatabaseHandler) DoInitialSetup() error {
 		event_time timestamptz NOT NULL DEFAULT now(),
 		client_time timestamptz DEFAULT now(),
 		data jsonb NOT NULL,
-		PRIMARY KEY(clientId, event_time)
+		PRIMARY KEY(clientId, event_type, event_time)
 		)`); err != nil {
 		return err
 	}
