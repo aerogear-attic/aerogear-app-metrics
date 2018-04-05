@@ -169,13 +169,13 @@ func createRandomMetric(i int, service web.MetricsServiceInterface, opts *SeedOp
 	if err != nil {
 		log.Printf("Error creating record %d: %v\n", i+1, err)
 	} else {
-		fmt.Printf("Created record %d\n", i+1)
+		log.Printf("Created record %d\n", i+1)
 	}
 }
 
 func getMetricsServiceImpl(opts *SeedOptions) web.MetricsServiceInterface {
 	if opts.httpTarget != "" {
-		fmt.Printf("Utilizing http metrics creation targetting host %v\n", opts.httpTarget)
+		log.Printf("Utilizing http metrics creation targetting host %v\n", opts.httpTarget)
 		return NewHTTPService(opts.httpTarget)
 	}
 	fmt.Println("Targetting default postgresql instance")
