@@ -73,9 +73,9 @@ func TestCreate(t *testing.T) {
 	dao := NewMetricsDAO(dbHandler.DB)
 
 	clientId := "org.aerogear.metrics.testing"
-	metricsData := []byte("{\"app\":{\"id\":\"com.example.someApp\",\"sdkVersion\":\"2.4.6\",\"appVersion\":\"256\"},\"device\":{\"platform\":\"android\",\"platformVersion\":\"27\"}}")
+	metricsData := []byte(`{"app":{"id":"com.example.someApp","sdkVersion":"2.4.6","appVersion":"256"},"device":{"platform":"android","platformVersion":"27"}}`)
 
-	err = dao.Create(clientId, metricsData, nil)
+	err = dao.Create(clientId, "init", metricsData, nil)
 
 	if err != nil {
 		t.Errorf("Create() returned an error %s", err.Error())
@@ -97,7 +97,7 @@ func TestCreateBadJSON(t *testing.T) {
 	clientId := "org.aerogear.metrics.testing"
 	metricsData := []byte("InvalidJSON")
 
-	err = dao.Create(clientId, metricsData, nil)
+	err = dao.Create(clientId, "init", metricsData, nil)
 
 	if err == nil {
 		t.Errorf("Create() with invalid JSON did not return an error")
@@ -123,9 +123,9 @@ func TestCreateEmptyClientID(t *testing.T) {
 	dao := NewMetricsDAO(dbHandler.DB)
 
 	clientId := ""
-	metricsData := []byte("{\"app\":{\"id\":\"com.example.someApp\",\"sdkVersion\":\"2.4.6\",\"appVersion\":\"256\"},\"device\":{\"platform\":\"android\",\"platformVersion\":\"27\"}}")
+	metricsData := []byte(`{"app":{"id":"com.example.someApp","sdkVersion":"2.4.6","appVersion":"256"},"device":{"platform":"android","platformVersion":"27"}}`)
 
-	err = dao.Create(clientId, metricsData, nil)
+	err = dao.Create(clientId, "init", metricsData, nil)
 
 	if err == nil {
 		t.Errorf("Create() with empty clientId did not return an error")
@@ -151,10 +151,10 @@ func TestCreateClientTimestamp(t *testing.T) {
 	dao := NewMetricsDAO(dbHandler.DB)
 
 	clientId := "org.aerogear.metrics.testing"
-	metricsData := []byte("{\"app\":{\"id\":\"com.example.someApp\",\"sdkVersion\":\"2.4.6\",\"appVersion\":\"256\"},\"device\":{\"platform\":\"android\",\"platformVersion\":\"27\"}}")
+	metricsData := []byte(`{"app":{"id":"com.example.someApp","sdkVersion":"2.4.6","appVersion":"256"},"device":{"platform":"android","platformVersion":"27"}}`)
 	time := time.Now()
 
-	err = dao.Create(clientId, metricsData, &time)
+	err = dao.Create(clientId, "init", metricsData, &time)
 
 	if err != nil {
 		t.Errorf("Create() returned an error %s", err.Error())
