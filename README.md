@@ -88,6 +88,8 @@ This section shows example `curl` requests which can be used to send some data t
 
 The following request corresponds to an app initialization event.
 
+#### Init type metric request
+
 ```
 curl -i -X POST \
   http://localhost:3000/metrics \
@@ -96,6 +98,7 @@ curl -i -X POST \
   -H 'Postman-Token: 87bf2b99-7cdc-8df9-9b2d-6cdcd2932159' \
   -d '{
   "clientId": "453de7432",
+  "type": "init",
   "data": {
     "app": {
       "appId": "com.example.someApp",
@@ -122,31 +125,32 @@ curl -X POST \
   -H 'Postman-Token: 6db8f0ae-4e9e-1ae1-530b-138b1a87bfe7' \
   -d '{
   "clientId": "9796fb69-a566-43fb-b932-03951d82437f",
+  "type": "security",
   "timestamp": 1519989859342,
   "data": {
     "security": [
       {
-        "type": "org.aerogear.mobile.security.checks.DeveloperModeCheck",
+        "id": "org.aerogear.mobile.security.checks.DeveloperModeCheck",
         "name": "Developer Mode Check",
         "passed": true
       },
      {
-        "type": "org.aerogear.mobile.security.checks.EmulatorCheck",
+        "id": "org.aerogear.mobile.security.checks.EmulatorCheck",
         "name": "Emulator Check",
         "passed": false
       },
       {
-        "type": "org.aerogear.mobile.security.checks.DebuggerCheck",
+        "id": "org.aerogear.mobile.security.checks.DebuggerCheck",
         "name": "Debugger Check",
         "passed": false
       },
       {
-        "type": "org.aerogear.mobile.security.checks.RootedCheck",
+        "id": "org.aerogear.mobile.security.checks.RootedCheck",
         "name": "Rooted Check",
         "passed": false
       },
       {
-        "type": "org.aerogear.mobile.security.checks.ScreenLockCheck",
+        "id": "org.aerogear.mobile.security.checks.ScreenLockCheck",
         "name": "Screen Lock Check",
         "passed": false
       }
@@ -188,11 +192,19 @@ The `makefile` provided provides commands for building and testing the code. For
 ### Generating test data
 
 Use the `scripts/data-fill` script to generate random data targetting the same database as the main binary.
-By default it generates 15k records with some data variance. You can override these via cli flags:
+By default it generates 1k records with some data variance. You can override these via cli flags:
 
 ```
 go run scripts/data-fill.go -n=100 -apps=5
 ```
+
+It is also possible to specify a given number of records of each metrics type to generate using the `n*` flags:
+
+```
+go run scripts/data-fill.go -nInit=100 -nSecurity=1000
+```
+
+The above will create 100 entries of records containing the `app` and `platform` keys inside `data`, followed by 1000 containing `security`.
 
 ## Environment Variables
 

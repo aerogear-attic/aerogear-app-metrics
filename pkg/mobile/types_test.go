@@ -1,110 +1,119 @@
-package mobile
+package mobile_test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
+
+	"github.com/aerogear/aerogear-app-metrics/pkg/mobile"
+	"github.com/aerogear/aerogear-app-metrics/pkg/test"
 )
 
 func TestMetricValidate(t *testing.T) {
-
-	securityMetricId := "org.aerogear.mobile.security.checks.TestCheck"
-	securityMetricName := "TestCheck"
-	securityMetricPassed := true
-
-	bigSecurityMetricList := SecurityMetrics{}
-	for i := 0; i <= clientIdMaxLength+1; i++ {
-		bigSecurityMetricList = append(bigSecurityMetricList, SecurityMetric{Id: &securityMetricId, Passed: &securityMetricPassed})
-	}
-
 	testCases := []struct {
 		Name           string
-		Metric         Metric
+		MetricBuilder  func() mobile.Metric
 		Valid          bool
 		ExpectedReason string
 	}{
 		{
 			Name:           "Empty metric should be invalid",
-			Metric:         Metric{},
+			MetricBuilder:  test.GetEmptyMetric,
 			Valid:          false,
-			ExpectedReason: missingClientIdError,
+			ExpectedReason: mobile.MissingClientIdError,
 		},
 		{
 			Name:           "Metric with no clientId should be invalid",
-			Metric:         Metric{Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			MetricBuilder:  test.GetNoClientIdMetric,
 			Valid:          false,
-			ExpectedReason: missingClientIdError,
+			ExpectedReason: mobile.MissingClientIdError,
 		},
 		{
 			Name:           "Metric with long clientId should be invalid",
-			Metric:         Metric{ClientId: strings.Join(make([]string, clientIdMaxLength+10), "a"), Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			MetricBuilder:  test.GetLargeClientIdMetric,
 			Valid:          false,
-			ExpectedReason: clientIdLengthError,
+			ExpectedReason: mobile.ClientIdLengthError,
 		},
 		{
 			Name:           "Metric with no Data should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing"},
+			MetricBuilder:  test.GetNoDataMetric,
 			Valid:          false,
-			ExpectedReason: missingDataError,
+			ExpectedReason: mobile.MissingDataError,
 		},
 		{
 			Name:           "Metric with empty Data should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{}},
+			MetricBuilder:  test.GetEmptyDataMetric,
 			Valid:          false,
-			ExpectedReason: missingDataError,
+			ExpectedReason: mobile.MissingDataError,
 		},
 		{
-			Name:           "Metric with ClientId and only app data should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
-			Valid:          false,
-			ExpectedReason: initMetricsIncompleteError,
+			Name:           "Metric with ClientId and Some Data should be valid",
+			MetricBuilder:  test.GetValidInitMetric,
+			Valid:          true,
+			ExpectedReason: "",
 		},
 		{
 			Name:           "Metric with bad timestamp should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "invalid", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}}},
+			MetricBuilder:  test.GetMetricWithInvalidTimestamp,
 			Valid:          false,
-			ExpectedReason: invalidTimestampError,
+			ExpectedReason: mobile.InvalidTimestampError,
 		},
 		{
 			Name:           "Metric with valid timestamp should be valid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", ClientTimestamp: "12345", Data: &MetricData{App: &AppMetric{SDKVersion: "1"}, Device: &DeviceMetric{Platform: "android"}}},
+			MetricBuilder:  test.GetMetricWithTimestamp,
+			Valid:          true,
+			ExpectedReason: "",
+		},
+		{
+			Name:           "Filled Security Metrics should be valid",
+			MetricBuilder:  test.GetValidSecurityMetric,
 			Valid:          true,
 			ExpectedReason: "",
 		},
 		{
 			Name:           "Security Metrics with missing id field should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Id: nil, Name: &securityMetricName, Passed: &securityMetricPassed}}}},
+			MetricBuilder:  test.GetNoIdSecurityMetric,
 			Valid:          false,
-			ExpectedReason: fmt.Sprintf(securityMetricMissingIdError, 0),
+			ExpectedReason: fmt.Sprintf(mobile.SecurityMetricMissingIdError, 0),
 		},
 		{
 			Name:           "Security Metrics with missing name field should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Id: &securityMetricId, Name: nil, Passed: &securityMetricPassed}}}},
+			MetricBuilder:  test.GetNoNameSecurityMetric,
 			Valid:          false,
-			ExpectedReason: fmt.Sprintf(securityMetricMissingNameError, 0),
+			ExpectedReason: fmt.Sprintf(mobile.SecurityMetricMissingNameError, 0),
 		},
 		{
 			Name:           "Security Metrics with missing passed field should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{SecurityMetric{Id: &securityMetricId, Name: &securityMetricName, Passed: nil}}}},
+			MetricBuilder:  test.GetNoPassedSecurityMetric,
 			Valid:          false,
-			ExpectedReason: fmt.Sprintf(securityMetricMissingPassedError, 0),
+			ExpectedReason: fmt.Sprintf(mobile.SecurityMetricMissingPassedError, 0),
 		},
 		{
 			Name:           "Empty Security Metrics slice should be invalid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &SecurityMetrics{}}},
+			MetricBuilder:  test.GetEmptySecurityMetric,
 			Valid:          false,
-			ExpectedReason: securityMetricsEmptyError,
+			ExpectedReason: mobile.SecurityMetricsEmptyError,
 		},
 		{
 			Name:           "Security Metrics slice with length > max length should be valid",
-			Metric:         Metric{ClientId: "org.aerogear.metrics.testing", Data: &MetricData{Security: &bigSecurityMetricList}},
+			MetricBuilder:  test.GetOverfilledSecurityMetric,
 			Valid:          false,
-			ExpectedReason: securityMetricsLengthError,
+			ExpectedReason: mobile.SecurityMetricsLengthError,
+		},
+		{
+			Name: "Metrics with invalid event_type should be invalid",
+			MetricBuilder: func() mobile.Metric {
+				m := test.GetValidInitMetric()
+				m.EventType = "dunno"
+				return m
+			},
+			Valid:          false,
+			ExpectedReason: mobile.UnknownTypeError,
 		},
 	}
 
 	for _, tc := range testCases {
-		valid, reason := tc.Metric.Validate()
+		metric := tc.MetricBuilder()
+		valid, reason := metric.Validate()
 
 		if valid != tc.Valid {
 			t.Errorf("case failed: %s. Expected: %v, got %v", tc.Name, tc.Valid, valid)

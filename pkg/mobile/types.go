@@ -23,6 +23,9 @@ type Metric struct {
 	ClientId string `json:"clientId"`
 	// required: true
 	Data *MetricData `json:"data,omitempty"`
+	// required: true
+	// example: init
+	EventType string `json:"type"`
 }
 
 // swagger:model
@@ -73,61 +76,102 @@ type SecurityMetric struct {
 }
 
 const clientIdMaxLength = 128
+const eventTypeMaxLength = 128
 const securityMetricsMaxLength = 30
 
-const missingClientIdError = "missing clientId in payload"
-const invalidTimestampError = "timestamp must be a valid number"
-const missingDataError = "missing metrics data in payload"
-const initMetricsIncompleteError = "data.app and data.security must both be present simultaneously"
-const securityMetricsEmptyError = "data.security cannot be empty"
-const securityMetricMissingIdError = "invalid element in data.security at position %v, id must be included"
-const securityMetricMissingNameError = "invalid element in data.security at position %v, name must be included"
-const securityMetricMissingPassedError = "invalid element in data.security at position %v, passed must be included"
+const MissingClientIdError = "Missing clientId in payload"
+const MissingEventTypeError = "Missing type in payload"
+const UnknownTypeError = "payload type unknown"
+const MissingAppError = "Missing data.app in init-type payload"
+const MissingDeviceError = "Missing data.device in init-type payload"
+const MissingSecurityError = "Missing data.security in security-type payload"
+const MissingDataError = "Missing metrics data in payload"
+const InitMetricsIncompleteError = "data.app and data.security must both be present simultaneously"
 
-var clientIdLengthError = fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength)
-var securityMetricsLengthError = fmt.Sprintf("maximum length of data.security %v", securityMetricsMaxLength)
+const InvalidTimestampError = "timestamp must be a valid number"
+const SecurityMetricsEmptyError = "data.security cannot be empty"
+const SecurityMetricMissingIdError = "invalid element in data.security at position %v, id must be included"
+const SecurityMetricMissingNameError = "invalid element in data.security at position %v, name must be included"
+const SecurityMetricMissingPassedError = "invalid element in data.security at position %v, passed must be included"
+
+var ClientIdLengthError = fmt.Sprintf("clientId exceeded maximum length of %v", clientIdMaxLength)
+
+var EventTypeLengthError = fmt.Sprintf("type exceeded maximum length of %v", eventTypeMaxLength)
+
+var SecurityMetricsLengthError = fmt.Sprintf("maximum length of data.security %v", securityMetricsMaxLength)
 
 func (m *Metric) Validate() (valid bool, reason string) {
 	if m.ClientId == "" {
-		return false, missingClientIdError
+		return false, MissingClientIdError
 	}
 
 	if len(m.ClientId) > clientIdMaxLength {
-		return false, clientIdLengthError
+		return false, ClientIdLengthError
+	}
+
+	if m.EventType == "" {
+		return false, MissingEventTypeError
+	}
+
+	if len(m.EventType) > eventTypeMaxLength {
+		return false, EventTypeLengthError
 	}
 
 	if m.ClientTimestamp != "" {
 		if _, err := m.ClientTimestamp.Int64(); err != nil {
-			return false, invalidTimestampError
+			return false, InvalidTimestampError
 		}
 	}
 
-	// check if data field was missing or empty object
+	// check if data field was Missing or empty object
 	if m.Data == nil || (MetricData{}) == *m.Data {
-		return false, missingDataError
+		return false, MissingDataError
 	}
 
-	if (m.Data.Device != nil && m.Data.App == nil) || (m.Data.Device == nil && m.Data.App != nil) {
-		return false, initMetricsIncompleteError
+	switch m.EventType {
+	case "init":
+		return validateInitMetric(m.Data)
+	case "security":
+		return validateSecurityMetric(m.Data)
+	default:
+		return false, UnknownTypeError
+	}
+}
+
+func validateInitMetric(data *MetricData) (valid bool, reason string) {
+	if data.App == nil {
+		return false, MissingAppError
+	}
+	if data.Device == nil {
+		return false, MissingDeviceError
+	}
+	return true, ""
+}
+
+func validateSecurityMetric(data *MetricData) (valid bool, reason string) {
+	// security type includes data from 'init'
+	if ok, reason := validateInitMetric(data); !ok {
+		return false, reason
+	}
+	if data.Security == nil {
+		return false, MissingSecurityError
 	}
 
-	if m.Data.Security != nil {
-		if len(*m.Data.Security) == 0 {
-			return false, securityMetricsEmptyError
+	if len(*data.Security) == 0 {
+		return false, SecurityMetricsEmptyError
+	}
+	if len(*data.Security) > securityMetricsMaxLength {
+		return false, SecurityMetricsLengthError
+	}
+	for i, sm := range *data.Security {
+		if sm.Id == nil {
+			return false, fmt.Sprintf(SecurityMetricMissingIdError, i)
 		}
-		if len(*m.Data.Security) > securityMetricsMaxLength {
-			return false, securityMetricsLengthError
+		if sm.Name == nil {
+			return false, fmt.Sprintf(SecurityMetricMissingNameError, i)
 		}
-		for i, sm := range *m.Data.Security {
-			if sm.Id == nil {
-				return false, fmt.Sprintf(securityMetricMissingIdError, i)
-			}
-			if sm.Name == nil {
-				return false, fmt.Sprintf(securityMetricMissingNameError, i)
-			}
-			if sm.Passed == nil {
-				return false, fmt.Sprintf(securityMetricMissingPassedError, i)
-			}
+		if sm.Passed == nil {
+			return false, fmt.Sprintf(SecurityMetricMissingPassedError, i)
 		}
 	}
 	return true, ""
