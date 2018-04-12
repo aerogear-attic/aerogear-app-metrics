@@ -83,7 +83,7 @@ objects:
             value: postgres
           - name: PGDATABASE
             value: aerogear_mobile_metrics
-          image: docker.io/aerogear/aerogear-app-metrics
+          image: docker.io/aerogear/aerogear-app-metrics:master
           imagePullPolicy: Always
           name: aerogear-app-metrics
           ports:
