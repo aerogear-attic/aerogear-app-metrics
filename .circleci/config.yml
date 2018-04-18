@@ -72,6 +72,6 @@ workflows:
             - build
           filters:
             tags:
-              only: /\d\.\d\.\d/
+              only: /\d{1,2}\.\d{1,2}\.\d{1,2}/
             branches:
               ignore: /.*/
