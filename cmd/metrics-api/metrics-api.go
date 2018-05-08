@@ -38,9 +38,6 @@ func main() {
 
 	// allow CORS for localhost
 	handler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedHeaders:   []string{"X-Requested-With"},
-		AllowedMethods:   []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
 		AllowCredentials: true,
 	}).Handler(router)
 
