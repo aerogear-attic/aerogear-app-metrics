@@ -47,7 +47,6 @@ func MetricsRoute(r *mux.Router, handler *metricsHandler) {
 	//   '500':
 	//     description: Server Error
 	r.HandleFunc("/metrics", handler.CreateMetric).Methods("POST")
-	r.HandleFunc("/metrics", handler.MetricOptions).Methods("OPTIONS")
 }
 
 func HealthzRoute(r *mux.Router, handler *healthHandler) {

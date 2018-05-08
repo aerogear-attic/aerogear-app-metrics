@@ -17,13 +17,6 @@ func NewMetricsHandler(ms MetricsServiceInterface) *metricsHandler {
 	return &metricsHandler{metricService: ms}
 }
 
-func (mh *metricsHandler) MetricOptions(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
-	w.WriteHeader(200)
-}
-
 func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -51,7 +44,5 @@ func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 		boom.BadImplementation(w)
 		return
 	}
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.WriteHeader(204)
 }
