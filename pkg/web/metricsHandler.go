@@ -44,6 +44,5 @@ func (mh *metricsHandler) CreateMetric(w http.ResponseWriter, r *http.Request) {
 		boom.BadImplementation(w)
 		return
 	}
-
 	w.WriteHeader(204)
 }
