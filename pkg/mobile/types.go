@@ -46,6 +46,9 @@ type AppMetric struct {
 	// required: true
 	// example: 2.1.0
 	AppVersion string `json:"appVersion"`
+	// required : true
+	// example: cordova
+	Framework string `json:"framework"`
 }
 
 // swagger:model

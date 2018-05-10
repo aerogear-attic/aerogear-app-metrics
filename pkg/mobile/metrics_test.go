@@ -36,6 +36,7 @@ func TestCreateCallsDAOWithCorrectArgs(t *testing.T) {
 				ID:         "12345678",
 				SDKVersion: "1.0.0",
 				AppVersion: "1",
+				Framework:  "native",
 			},
 			Device: &DeviceMetric{
 				Platform:        "Android",
@@ -75,6 +76,7 @@ func TestCreateReturnsErrorFromDAO(t *testing.T) {
 				ID:         "12345678",
 				SDKVersion: "1.0.0",
 				AppVersion: "1",
+				Framework:  "native",
 			},
 			Device: &DeviceMetric{
 				Platform:        "Android",
@@ -112,6 +114,7 @@ func TestCreateCallsDaoWithCorrectTimestamp(t *testing.T) {
 				ID:         "12345678",
 				SDKVersion: "1.0.0",
 				AppVersion: "1",
+				Framework:  "native",
 			},
 			Device: &DeviceMetric{
 				Platform:        "Android",
