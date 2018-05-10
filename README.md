@@ -100,7 +100,8 @@ curl -i -X POST \
     "app": {
       "appId": "com.example.someApp",
       "sdkVersion": "2.4.6",
-      "appVersion": "256"
+      "appVersion": "256",
+      "framework": "native"
     },
     "device": {
       "platform": "android",
