@@ -1,0 +1,28 @@
+FROM rhel7:latest
+
+ENV GOPATH=/go \
+    PATH="${PATH}:${GOPATH}/bin"
+RUN mkdir $GOPATH
+
+COPY . $GOPATH/src/github.com/aerogear/aerogear-app-metrics
+
+RUN yum install -y golang make git \
+        && cd $GOPATH/src/github.com/aerogear/aerogear-app-metrics \
+        && go build -o metrics-api ./cmd/metrics-api/metrics-api.go \
+        && cp $GOPATH/src/github.com/aerogear/aerogear-app-metrics/metrics-api /usr/bin/ \
+        && yum erase -y golang make git \
+        && yum clean all
+
+USER 1001
+
+EXPOSE 3000
+ENTRYPOINT ["/usr/bin/metrics-api"]
+
+LABEL com.redhat.component="mobile-app-metrics-container" \
+      io.k8s.display-name="Mobile App Metrics" \
+      io.k8s.description="This is the server component of the AeroGear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database." \
+      io.openshift.tags="mobile" \
+      name="mobile/mobile-app-metrics" \
+      License="ASL 2.0" \
+      version="1.0.0" \
+      vendor="Red Hat"
