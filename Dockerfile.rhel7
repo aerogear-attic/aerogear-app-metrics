@@ -1,17 +1,12 @@
+FROM openshift/origin-release:golang-1.10 as builder
+
+WORKDIR /go/src/github.com/aerogear/aerogear-app-metrics
+COPY . .
+RUN go build -o metrics-api ./cmd/metrics-api/metrics-api.go
+
 FROM rhel7:latest
 
-ENV GOPATH=/go \
-    PATH="${PATH}:${GOPATH}/bin"
-RUN mkdir $GOPATH
-
-COPY . $GOPATH/src/github.com/aerogear/aerogear-app-metrics
-
-RUN yum install -y golang make git \
-        && cd $GOPATH/src/github.com/aerogear/aerogear-app-metrics \
-        && go build -o metrics-api ./cmd/metrics-api/metrics-api.go \
-        && cp $GOPATH/src/github.com/aerogear/aerogear-app-metrics/metrics-api /usr/bin/ \
-        && yum erase -y golang make git \
-        && yum clean all
+COPY --from=builder /go/src/github.com/aerogear/aerogear-app-metrics/metrics-api /usr/bin/
 
 USER 1001
 
