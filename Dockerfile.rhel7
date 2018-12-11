@@ -19,5 +19,4 @@ LABEL com.redhat.component="mobile-app-metrics-container" \
       io.openshift.tags="mobile" \
       name="mobile/mobile-app-metrics" \
       License="ASL 2.0" \
-      version="1.0.0" \
-      vendor="Red Hat"
+      version="1.0.0"
