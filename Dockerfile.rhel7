@@ -16,7 +16,10 @@ ENTRYPOINT ["/usr/bin/metrics-api"]
 LABEL com.redhat.component="mobile-app-metrics-container" \
       io.k8s.display-name="Mobile App Metrics" \
       io.k8s.description="This is the server component of the AeroGear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database." \
+      description="This is the server component of the AeroGear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database." \
+      summary="This is the server component of the AeroGear Metrics Service. It is a RESTful API that allows mobile clients to send metrics data which will get stored in a PostgreSQL database." \
+      usage="This image is intended to be used on OpenShift to work with mobile apps and cloud services" \
+      maintainer="Red Hat Mobile team" \
       io.openshift.tags="mobile" \
       name="mobile/mobile-app-metrics" \
-      License="ASL 2.0" \
       version="1.0.0"
