@@ -21,5 +21,5 @@ LABEL com.redhat.component="mobile-app-metrics-container" \
       usage="This image is intended to be used on OpenShift to work with mobile apps and cloud services" \
       maintainer="Red Hat Mobile team" \
       io.openshift.tags="mobile" \
-      name="mobile/mobile-app-metrics" \
-      version="1.0.0"
+      name="mobile-1-tech-preview/mobile-app-metrics" \
+      version="0.0.13"
