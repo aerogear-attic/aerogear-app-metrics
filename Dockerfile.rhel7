@@ -22,4 +22,4 @@ LABEL com.redhat.component="mobile-app-metrics-container" \
       maintainer="Red Hat Mobile team" \
       io.openshift.tags="mobile" \
       name="mobile-1-tech-preview/mobile-app-metrics" \
-      version="0.0.13"
+      version="0.0.14"
